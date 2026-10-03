@@ -284,3 +284,20 @@ body.noscroll { overflow: hidden; }
 [data-i="home"] { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2011%2012%203l9%208M5%209.5V21h5v-6h4v6h5V9.5%22/%3E%3C/svg%3E"); }
 [data-i="pdf"] { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M14%203H6a2%202%200%200%200-2%202v14a2%202%200%200%200%202%202h12a2%202%200%200%200%202-2V9z%22/%3E%3Cpath%20d%3D%22M14%203v6h6%22/%3E%3C/svg%3E"); }
 [data-i="details"] { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%205v14M6%2013l6%206%206-6%22/%3E%3C/svg%3E"); }
+[data-i="coffee"] { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%209h12v5a5%205%200%200%201-5%205H9a5%205%200%200%201-5-5zM16%2010h1.5a2.5%202.5%200%200%201%200%205H16M8%203v3M12%203v3%22/%3E%3C/svg%3E"); }
+[data-i="market"] { --ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2010h18l-1.5-5h-15zM4%2010v10h16V10M3%2010a3%203%200%200%200%206%200%203%203%200%200%200%206%200%203%203%200%200%200%206%200M10%2020v-5h4v5%22/%3E%3C/svg%3E"); }
+/* Favourites */
+.h-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.fav-btn { flex: none; width: 40px; height: 40px; margin: -8px 0 -8px -8px; border: 0; background: transparent; color: #c99400; font-size: 24px; line-height: 1; cursor: pointer; border-radius: 50%; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.fav-btn[aria-pressed="false"] { color: var(--muted); }
+.fav-btn:focus-visible { outline: 2px solid var(--see); }
+.fav-btn.in-pop { all: unset; cursor: pointer; font-size: 22px; color: #c99400; margin-left: 10px; vertical-align: middle; }
+.fav-btn.in-pop[aria-pressed="false"] { color: #8a94a3; }
+.chip-fav[aria-pressed="false"] { color: #a07600; }
+.tag.stars { background: #fff4cc; color: #8a6400; }
+@media (prefers-color-scheme: dark) { .tag.stars { background: #3d3210; color: #f3cf5a; } .chip-fav[aria-pressed="false"] { color: #f3cf5a; } }
+/* Coffee and market pins */
+.pin.coffee .d { background: #7a4b2a; } .pin.coffee .t { color: #6b3f22; }
+.pin.market .d { background: #2f8a5b; } .pin.market .t { color: #23704a; }
+.pin.fav .d::after { content: "★"; position: absolute; right: -9px; top: -9px; transform: rotate(45deg); width: 16px; height: 16px; border-radius: 50%; background: #ffc928; color: #6b4c00; font-size: 11px; line-height: 16px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,.35); }
+#map.z-lo .pin:not(.fav):not(.home) .t { display: none; }

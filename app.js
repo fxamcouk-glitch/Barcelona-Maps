@@ -1,5 +1,6 @@
 import { firebaseConfig } from "./firebase-config.js";
 import { SEED } from "./seed.js";
+import { GUIDE_PLACES, GUIDE_STARS } from "./guides.js?v=18";
 
 const FB = "https://www.gstatic.com/firebasejs/10.12.2/";
 /* Our stay, from the booking map: Dreta de l'Eixample, just north of Diagonal. Nearest metro: Diagonal (L3, L5). */
@@ -9,12 +10,32 @@ const AREAS = [
   { id: "uptown", name: "Gaudí & uptown", blurb: "Right on our doorstep. Bar Mut is a few minutes' walk, Sagrada Família about 15 minutes east, and Park Güell is two stops up the L3 from Diagonal to Lesseps. Sagrada Família and Park Güell need timed tickets." },
   { id: "old", name: "La Rambla & Old Town", blurb: "About 30 minutes' walk down Passeig de Gràcia, or three stops on the L3 from Diagonal to Liceu. Go to the market in the morning." },
   { id: "montjuic", name: "Montjuïc", blurb: "A half-day on the hill to the south-west: L3 from Diagonal to Paral·lel, then the funicular up. The Olympic Stadium is a quick look; Miró and MNAC are next to it. Avoid Sunday afternoon (MNAC shuts at 3pm)." },
+  { id: "coffee", name: "Coffee", blurb: "Specialty coffee recommended across six coffee guides. ⭐ shows how many guides mention each one." },
+  { id: "tapas", name: "Tapas from the guides", blurb: "The bars that came up most across six tapas guides. ⭐ shows how many mention each one." },
+  { id: "markets", name: "Markets", blurb: "Food markets locals actually use, from six market guides. Most are closed on Sunday." },
   { id: "added", name: "Added by the group", blurb: "New suggestions from any of us. Newest first." }
 ];
 const FIELDS = ["name","type","area","order","note","from","hours","walk","lat","lng","pid","address","link","bookUrl","book","addedBy","createdAt","editedAt","editedBy"];
 
 const $ = id => document.getElementById(id);
 let PLACES = [], filter = "all", ME = null, store = null;
+/* Favourites are personal: kept on this phone only. */
+let FAVS = new Set();
+try { FAVS = new Set(JSON.parse(localStorage.getItem("bcn-favs") || "[]")); } catch (_) {}
+const saveFavs = () => { try { localStorage.setItem("bcn-favs", JSON.stringify([...FAVS])); } catch (_) {} };
+function toggleFav(id) {
+  FAVS.has(id) ? FAVS.delete(id) : FAVS.add(id); saveFavs();
+  document.querySelectorAll(`[data-fav="${id}"]`).forEach(b => { const on = FAVS.has(id); b.setAttribute("aria-pressed", String(on)); b.textContent = on ? "★" : "☆"; b.setAttribute("aria-label", (on ? "Remove from" : "Add to") + " favourites"); });
+  const m = markers.get(id); if (m) m.setIcon(pinIcon(PLACES.find(p => p.id === id)));
+  updateFavChip(); if (filter === "fav") applyFilter();
+}
+function favBtn(id, extra) {
+  const b = document.createElement("button"); b.type = "button"; b.className = "fav-btn" + (extra ? " " + extra : ""); b.dataset.fav = id;
+  const on = FAVS.has(id); b.textContent = on ? "★" : "☆"; b.setAttribute("aria-pressed", String(on)); b.setAttribute("aria-label", (on ? "Remove from" : "Add to") + " favourites");
+  b.addEventListener("click", e => { e.stopPropagation(); toggleFav(id); });
+  return b;
+}
+function updateFavChip() { const c = document.querySelector('.chip[data-f="fav"] .n'); if (c) c.textContent = FAVS.size ? " " + FAVS.size : ""; }
 
 /* ---------------- map ---------------- */
 const dark = matchMedia("(prefers-color-scheme: dark)");
@@ -59,13 +80,15 @@ base.addTo(map);
 
 /* Pins in the style of Google / Airbnb maps: a coloured teardrop with an icon, label beside it. */
 const GLYPH = {
+  coffee: '<svg viewBox="0 0 24 24"><path d="M4 8h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zm12 1h1.5a3 3 0 0 1 0 6H16v-2h1.5a1 1 0 0 0 0-2H16z" fill="currentColor"/></svg>',
+  market: '<svg viewBox="0 0 24 24"><path d="M3 9 4.5 4h15L21 9a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0zm1 4.5a4.6 4.6 0 0 0 2 .5v6h4v-4h4v4h4v-6a4.6 4.6 0 0 0 2-.5V21H4z" fill="currentColor"/></svg>',
   eat: '<svg viewBox="0 0 24 24"><path d="M7 2v8a2 2 0 0 0 2 2v10h2V12a2 2 0 0 0 2-2V2h-1.5v6H11V2H9.5v6H9V2zm9.5 0C15 2 14 4 14 7v6h2.5v9H18.5V2z" fill="currentColor"/></svg>',
   see: '<svg viewBox="0 0 24 24"><path d="M12 2 2 7v2h20V7zM4 11v7h3v-7zm6.5 0v7h3v-7zM17 11v7h3v-7zM2 20v2h20v-2z" fill="currentColor"/></svg>',
   air: '<svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" fill="currentColor"/></svg>',
   home: '<svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3z" fill="currentColor"/></svg>'
 };
 const icon = (cls, label, sub) => L.divIcon({ className: "", iconSize: [0, 0], html:
-  `<div class="pin ${cls}"><div class="d">${GLYPH[cls] || ""}</div>${label ? `<div class="t">${esc(label)}${sub ? `<small>${esc(sub)}</small>` : ""}</div>` : ""}</div>` });
+  `<div class="pin ${cls}"><div class="d">${GLYPH[cls.split(" ")[0]] || ""}</div>${label ? `<div class="t">${esc(label)}${sub ? `<small>${esc(sub)}</small>` : ""}</div>` : ""}</div>` });
 L.marker([BASE.lat, BASE.lng], { icon: icon("home", "Your stay", "8 – 11 Oct"), keyboard: false, zIndexOffset: 1500 }).addTo(map).bindPopup("<b>Your stay</b>Just north of Diagonal. Nearest metro: Diagonal (L3, L5).");
 
 /* The page's fonts and layout can settle after the map is created, so re-measure
@@ -91,17 +114,22 @@ const markers = new Map();
 function drawMarkers() {
   markerLayer.clearLayers(); markers.clear();
   PLACES.forEach(p => {
-    const m = L.marker([p.lat, p.lng], { icon: icon(p.type === "eat" ? "eat" : "see", shortName(p)), title: p.name });
+    const m = L.marker([p.lat, p.lng], { icon: pinIcon(p), title: p.name, zIndexOffset: FAVS.has(p.id) ? 300 : 0 });
     const div = document.createElement("div");
     const b = document.createElement("b"); b.textContent = p.name;
     const sm = document.createElement("span"); sm.textContent = p.type === "eat" ? "Eat & drink" : "See";
     const go = document.createElement("button"); go.type = "button"; go.textContent = "Details"; go.dataset.i = "details";
     go.addEventListener("click", () => { map.closePopup(); focusCard(p.id); });
-    div.append(b, sm, document.createElement("br"), go);
+    const st = GUIDE_STARS[p.id]; if (st) sm.textContent += " · ⭐ " + st + " guides";
+    div.append(b, sm, document.createElement("br"), go, favBtn(p.id, "in-pop"));
     m.bindPopup(div);
     m.addTo(markerLayer); markers.set(p.id, m);
   });
   applyFilter();
+}
+function pinIcon(p) {
+  const cls = (p.area === "coffee" ? "coffee" : p.area === "markets" ? "market" : p.type === "eat" ? "eat" : "see") + (FAVS.has(p.id) ? " fav" : "");
+  return icon(cls, shortName(p));
 }
 /* Map labels drop generic prefixes ("Mercat de", "Fundació") so nearby pins don't collide. */
 function shortName(p) {
@@ -221,9 +249,11 @@ function card(p) {
   const tags = document.createElement("div"); tags.className = "tags";
   const tag = (cls, t) => { const s = document.createElement("span"); s.className = "tag " + cls; s.textContent = t; tags.appendChild(s); };
   tag(p.type === "eat" ? "eat" : "see", p.type === "eat" ? "Eat & drink" : "See");
+  const gs = GUIDE_STARS[p.id]; if (gs) tag("stars", "⭐ " + gs + " guides");
   if (p.book) tag("book", "Book ahead");
   if (me) tag("near", walkLabel(distM(me, p)) + " away");
-  top.append(h, tags); c.appendChild(top);
+  const hw = document.createElement("div"); hw.className = "h-row"; hw.append(favBtn(p.id), h);
+  top.append(hw, tags); c.appendChild(top);
   if (p.note) { const n = document.createElement("p"); n.className = "note"; n.textContent = p.note; c.appendChild(n); }
   const dl = document.createElement("dl"); dl.className = "facts";
   const fact = (k, v) => { if (!v) return; const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = v; dl.append(dt, dd); };
@@ -267,7 +297,11 @@ function focusPlace(id, toMap) {
 /* ---------------- filters ---------------- */
 function setFilter(f) { filter = f; document.querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.f === f))); applyFilter(); }
 function applyFilter() {
-  const show = p => filter === "all" || (filter === "book" ? !!p.book : p.type === filter);
+  const show = p => filter === "all" ? true
+    : filter === "fav" ? FAVS.has(p.id)
+    : filter === "coffee" ? p.area === "coffee"
+    : filter === "markets" ? (p.area === "markets" || ["caterina", "boqueria", "timeout"].includes(p.id))
+    : filter === "book" ? !!p.book : p.type === filter;
   PLACES.forEach(p => {
     const c = $("p-" + p.id); if (c) c.hidden = !show(p);
     const m = markers.get(p.id); if (m) { const el = m.getElement(); el && el.firstElementChild && el.firstElementChild.classList.toggle("dim", !show(p)); }
@@ -275,6 +309,10 @@ function applyFilter() {
   document.querySelectorAll("section.area").forEach(s => { s.hidden = !s.querySelector(".place:not([hidden])"); });
 }
 document.querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => setFilter(b.dataset.f)));
+updateFavChip();
+/* Hide pin labels when zoomed out so the map isn't a wall of text (favourites keep theirs). */
+const syncLabels = () => $("map").classList.toggle("z-lo", map.getZoom() < 15);
+map.on("zoomend", syncLabels); syncLabels();
 
 /* ---------------- add / edit ---------------- */
 let draft = null, draftMarker = null, draftType = "see", editingId = null, picking = false, pinEdited = false, lastPaste = "";
@@ -447,7 +485,25 @@ async function connect() {
     update: (id, body) => fs.updateDoc(fs.doc(col, id), clean(body, true)),
     remove: id => fs.deleteDoc(fs.doc(col, id))
   };
-  let fitted = false, seeded = false;
+  let fitted = false, seeded = false, imported = false;
+  /* Add the researched guide picks to the shared list once (per phone), skipping any already there. */
+  const importGuides = async snap => {
+    if (imported || snap.empty || snap.metadata.fromCache) return;
+    imported = true;
+    let done = false; try { done = localStorage.getItem("bcn-guides-v1") === "1"; } catch (_) {}
+    if (done) return;
+    const have = new Set(snap.docs.map(d => d.id));
+    const missing = GUIDE_PLACES.filter(p => !have.has(p.id));
+    if (missing.length) {
+      const b = fs.writeBatch(db);
+      missing.forEach(p => {
+        const { id, stars, cat, ...rest } = p;
+        b.set(fs.doc(col, id), clean({ ...rest, from: "Recommended in " + stars.replace("/", " of ") + " " + (cat === "market" ? "market" : cat) + " guides", createdAt: new Date().toISOString() }, false));
+      });
+      try { await b.commit(); } catch (e) { console.error("Couldn't add guide picks", e); return; }
+    }
+    try { localStorage.setItem("bcn-guides-v1", "1"); } catch (_) {}
+  };
   fs.onSnapshot(col, async snap => {
     if (snap.empty && !snap.metadata.fromCache && !seeded) {
       seeded = true;
@@ -458,6 +514,7 @@ async function connect() {
     }
     setPlaces(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     if (!fitted && PLACES.length) { fitted = true; fitAll(); }
+    importGuides(snap);
   }, err => {
     console.error(err);
     const e = document.createElement("div"); e.className = "empty";
