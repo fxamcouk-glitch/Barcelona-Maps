@@ -71,6 +71,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .leaflet-popup-content b { display: block; font-size: 14.5px; }
 .leaflet-popup-content button { all: unset; color: var(--see); font-weight: 600; cursor: pointer; margin-top: 4px; display: inline-block; }
 @media (prefers-color-scheme: dark) {
+  .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.9) contrast(.9); }
   .pin .t { color: #e8edf4; text-shadow: 0 0 2px #0f1520, 0 0 3px #0f1520, 0 0 4px #0f1520; }
   .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--surface); color: var(--fg); }
   .leaflet-bar a { background: var(--surface); color: var(--fg); border-color: var(--line); }

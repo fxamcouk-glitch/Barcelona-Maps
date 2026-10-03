@@ -18,12 +18,10 @@ let PLACES = [], filter = "all", ME = null, store = null;
 /* ---------------- map ---------------- */
 const dark = matchMedia("(prefers-color-scheme: dark)");
 const map = L.map("map", { zoomControl: true, tap: true }).setView([41.388, 2.168], 13);
-const tileUrl = () => `https://{s}.basemaps.cartocdn.com/${dark.matches ? "dark_all" : "rastertiles/voyager"}/{z}/{x}/{y}{r}.png`;
-const tiles = L.tileLayer(tileUrl(), {
-  maxZoom: 19, subdomains: "abcd",
-  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>'
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
-dark.addEventListener?.("change", () => tiles.setUrl(tileUrl()));
 
 const icon = (cls, label) => L.divIcon({ className: "", iconSize: [0, 0], html: `<div class="pin ${cls}"><div class="d"></div>${label ? `<div class="t">${esc(label)}</div>` : ""}</div>` });
 L.marker([BASE.lat, BASE.lng], { icon: icon("base", "Base"), keyboard: false, zIndexOffset: 500 }).addTo(map).bindPopup("<b>Base</b>Gran Via, near Passeig de Gràcia");
@@ -45,7 +43,11 @@ function drawMarkers() {
   });
   applyFilter();
 }
-function shortName(p) { return p.name.length > 22 ? p.name.slice(0, 20) + "…" : p.name; }
+/* Map labels drop generic prefixes ("Mercat de", "Fundació") so nearby pins don't collide. */
+function shortName(p) {
+  const n = p.name.replace(/^(Mercat de (la |l')?|Fundació |Museu |Basílica de la )/i, "").replace(/ Barcelona$/i, "");
+  return n.length > 20 ? n.slice(0, 18) + "…" : n;
+}
 function fitAll() {
   const pts = PLACES.map(p => [p.lat, p.lng]).concat([[BASE.lat, BASE.lng]]);
   if (me) pts.push([me.lat, me.lng]);
