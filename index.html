@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Barcelona, 8–11 October</title>
+<meta name="description" content="Our shared map of places to see and eat in Barcelona.">
+<meta name="theme-color" content="#16202e">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='13' r='9' fill='%231f4fd1'/%3E%3Cpath d='M16 30 9 18h14z' fill='%231f4fd1'/%3E%3Ccircle cx='16' cy='13' r='3.5' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Thu 8 – Sun 11 October 2026 · 3 of us</div>
+    <h1>Barcelona, 8–11 October</h1>
+    <p class="sub">Everything we've been recommended, on one map. Tap a pin for details, or <a href="#add">add somewhere new</a>.</p>
+  </header>
+
+  <div class="alert" role="note">
+    <strong>Book before we go</strong>
+    <span>Sagrada Família and Park Güell sell out days ahead. Picasso Museum, Fismuler and Bar Mut take bookings too.</span>
+  </div>
+
+  <div class="filters" role="group" aria-label="Filter places">
+    <button class="chip" data-f="all" aria-pressed="true">Everything</button>
+    <button class="chip" data-f="see" aria-pressed="false">See</button>
+    <button class="chip" data-f="eat" aria-pressed="false">Eat &amp; drink</button>
+    <button class="chip" data-f="book" aria-pressed="false">Needs booking</button>
+  </div>
+
+  <div class="map-card" id="map-card">
+    <div class="pick-banner" id="pick-banner" hidden>Tap the map where the place is</div>
+    <div id="map" role="region" aria-label="Map of Barcelona with our places"></div>
+    <div class="map-bar">
+      <button type="button" class="btn-loc" id="loc-btn" aria-pressed="false">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"/><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span id="loc-label">Show where I am</span>
+      </button>
+      <button type="button" class="btn" id="fit-btn">Show all places</button>
+      <span class="legend"><span class="dot" style="background:var(--base)"></span>Base</span>
+      <span class="legend"><span class="dot" style="background:var(--see)"></span>See</span>
+      <span class="legend"><span class="dot" style="background:var(--eat)"></span>Eat &amp; drink</span>
+    </div>
+  </div>
+
+  <section class="near-card" id="near" hidden aria-labelledby="near-h">
+    <h2 id="near-h">Nearest to you</h2>
+    <p class="near-status" id="near-status"></p>
+    <ol class="near-list" id="near-list"></ol>
+  </section>
+
+  <div id="areas"><div class="empty" id="empty">Loading the list…</div></div>
+
+  <section class="add-card" id="add" aria-labelledby="add-h">
+    <h2 id="add-h">Add a place</h2>
+    <p class="hint" id="add-hint">Paste from Google Maps, or type a name and address. It goes on the map for everyone straight away.</p>
+    <form id="add-form" novalidate>
+      <div class="field"><label for="a-paste">Paste from Google Maps (optional)</label>
+        <textarea id="a-paste" rows="2" placeholder="In Google Maps tap Share, then Copy, and paste here. The name and address fill in for you." autocomplete="off"></textarea></div>
+      <div class="field"><label for="a-name">Name</label><input id="a-name" maxlength="100" placeholder="e.g. Bunkers del Carmel" autocomplete="off"></div>
+      <div class="field"><span class="lab">What is it</span>
+        <div class="seg" role="group" aria-label="Type">
+          <button type="button" class="s-see" data-t="see" aria-pressed="true">See</button>
+          <button type="button" class="s-eat" data-t="eat" aria-pressed="false">Eat &amp; drink</button>
+        </div>
+      </div>
+      <div class="field"><label for="a-addr">Address</label><input id="a-addr" maxlength="300" placeholder="e.g. Carrer de Marià Lavèrnia, Barcelona" autocomplete="off">
+        <div class="row"><button type="button" class="btn" id="a-find">Find it on the map</button><button type="button" class="btn" id="a-pick">Or tap the map</button></div>
+        <div class="loc-status" id="a-loc">No pin yet.</div>
+      </div>
+      <div class="field"><label for="a-note">Why go</label><textarea id="a-note" maxlength="1000" placeholder="A line or two: what it is, when to go"></textarea></div>
+      <div class="field"><label for="a-from">Tip from (optional)</label><input id="a-from" maxlength="200" placeholder="Who recommended it, e.g. Spanish friend" autocomplete="off"></div>
+      <div class="field"><label for="a-who">Your name</label><input id="a-who" maxlength="60" placeholder="So the others know who added it" autocomplete="given-name"></div>
+      <div class="row"><button type="submit" class="btn-main" id="a-save">Add to the map</button><button type="button" class="btn" id="a-cancel" hidden>Cancel</button><span class="msg" id="a-msg" role="status"></span></div>
+    </form>
+  </section>
+
+  <footer>Opening hours are for our dates (Thu–Sun) and can change, so check before setting off. Map © OpenStreetMap contributors, © CARTO. Address search by OpenStreetMap Nominatim.</footer>
+</div>
+
+<div class="setup" id="setup" hidden>
+  <h2>Almost there</h2>
+  <p>The map works, but the shared list isn't connected yet. Paste your Firebase config into <code>firebase-config.js</code>.</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
