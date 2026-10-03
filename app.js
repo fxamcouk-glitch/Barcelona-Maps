@@ -1,6 +1,6 @@
 import { firebaseConfig } from "./firebase-config.js";
 import { SEED } from "./seed.js";
-import { GUIDE_PLACES, GUIDE_STARS } from "./guides.js?v=18";
+import { GUIDE_PLACES, GUIDE_STARS } from "./guides.js?v=19";
 
 const FB = "https://www.gstatic.com/firebasejs/10.12.2/";
 /* Our stay, from the booking map: Dreta de l'Eixample, just north of Diagonal. Nearest metro: Diagonal (L3, L5). */
@@ -116,10 +116,12 @@ function drawMarkers() {
   PLACES.forEach(p => {
     const m = L.marker([p.lat, p.lng], { icon: pinIcon(p), title: p.name, zIndexOffset: FAVS.has(p.id) ? 300 : 0 });
     const div = document.createElement("div");
-    const b = document.createElement("b"); b.textContent = p.name;
+    const sec = AREAS.find(a => a.id === (p.area || "added")) || AREAS[AREAS.length - 1];
+    const toCard = () => { map.closePopup(); focusCard(p.id); };
+    const b = document.createElement("button"); b.type = "button"; b.className = "pop-title"; b.textContent = p.name; b.addEventListener("click", toCard);
     const sm = document.createElement("span"); sm.textContent = p.type === "eat" ? "Eat & drink" : "See";
-    const go = document.createElement("button"); go.type = "button"; go.textContent = "Details"; go.dataset.i = "details";
-    go.addEventListener("click", () => { map.closePopup(); focusCard(p.id); });
+    const go = document.createElement("button"); go.type = "button"; go.className = "pop-go"; go.textContent = "View in " + sec.name; go.dataset.i = "details";
+    go.addEventListener("click", toCard);
     const st = GUIDE_STARS[p.id]; if (st) sm.textContent += " · ⭐ " + st + " guides";
     div.append(b, sm, document.createElement("br"), go, favBtn(p.id, "in-pop"));
     m.bindPopup(div);
@@ -231,7 +233,7 @@ function renderCards() {
     let items = PLACES.filter(p => (p.area || "added") === a.id);
     if (!items.length) return;
     items = a.id === "added" ? items.sort((x, y) => (y.createdAt || "").localeCompare(x.createdAt || "")) : items.sort((x, y) => (x.order || 0) - (y.order || 0));
-    const sec = document.createElement("section"); sec.className = "area";
+    const sec = document.createElement("section"); sec.className = "area"; sec.id = "sec-" + a.id;
     const head = document.createElement("div"); head.className = "area-head";
     const h = document.createElement("h2"); h.textContent = a.name;
     const bl = document.createElement("p"); bl.textContent = a.blurb;
@@ -285,7 +287,7 @@ function focusCard(id) {
   const c = $("p-" + id); if (!c) return;
   if (c.hidden) setFilter("all");
   c.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
-  c.classList.add("flash"); setTimeout(() => c.classList.remove("flash"), 1400);
+  c.classList.add("flash"); setTimeout(() => c.classList.remove("flash"), 2500);
 }
 function focusPlace(id, toMap) {
   const m = markers.get(id); if (!m) return;

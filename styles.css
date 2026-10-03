@@ -199,6 +199,9 @@ footer { color: var(--muted); font-size: 12.5px; }
 .viewer-body img { max-width: 100%; max-height: 100%; object-fit: contain; }
 .viewer-tip { margin: 0; padding: 10px 16px; text-align: center; font-size: 13px; color: #5b6676; }
 body.noscroll { overflow: hidden; }
+.leaflet-popup-content .pop-title { all: unset; display: block; font-weight: 700; font-size: 15px; cursor: pointer; text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 30%, transparent); text-underline-offset: 3px; }
+.leaflet-popup-content .pop-go { display: inline-flex; align-items: center; margin-top: 8px; padding: 6px 10px; border-radius: 7px; background: var(--fg); color: var(--bg); font-weight: 600; font-size: 13px; }
+.place.flash { border-color: var(--fg); box-shadow: 0 0 0 3px color-mix(in srgb, var(--see) 30%, transparent); transition: box-shadow .3s; }
 .upd { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 3000; min-height: 48px; padding: 0 18px; border-radius: 999px; border: 0;
   background: var(--fg); color: var(--bg); font: 700 15px var(--font-body); box-shadow: 0 6px 20px rgba(0,0,0,.25); cursor: pointer; white-space: nowrap; }
 .travel-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: grid; gap: 8px; }
