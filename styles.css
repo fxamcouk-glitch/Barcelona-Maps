@@ -76,6 +76,10 @@ button, a.btn, .chip { touch-action: manipulation; -webkit-tap-highlight-color: 
 .pin.see .d { background: var(--see); } .pin.eat .d { background: var(--eat); }
 .pin .t { position: absolute; left: 12px; top: -10px; white-space: nowrap; font: 600 12px var(--font-body); color: #16202e; text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #fff; pointer-events: none; }
 .pin.base .d { background: var(--base); border-radius: 4px; }
+.pin.air .d { background: var(--fg); border-radius: 4px; }
+.travel-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; display: grid; gap: 8px; }
+.travel-card h2 { font-size: 21px; }
+.tag.travel { background: color-mix(in srgb, var(--fg) 10%, transparent); color: var(--fg); }
 .pin.draft .d { background: transparent; border: 3px dashed var(--see); width: 22px; height: 22px; left: -11px; top: -11px; }
 .pin.dim { opacity: .2; }
 .pin.active .d { box-shadow: 0 0 0 6px color-mix(in srgb, var(--fg) 25%, transparent); }

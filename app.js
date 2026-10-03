@@ -53,6 +53,13 @@ new ResizeObserver(() => {
 }).observe($("map"));
 window.addEventListener("load", () => { map.invalidateSize(); if (PLACES.length) fitAll(); });
 
+const AIRPORT = [
+  { name: "Airport T1", lat: 41.2887, lng: 2.0726 },
+  { name: "Airport T2", lat: 41.3036, lng: 2.0790 }
+];
+AIRPORT.forEach(a => L.marker([a.lat, a.lng], { icon: icon("air", "✈︎ " + a.name), keyboard: false, zIndexOffset: 400 }).addTo(map).bindPopup("<b>Barcelona " + a.name.replace("Airport ", "Airport, ") + "</b>Aerobús to Plaça Catalunya"));
+$("air-show").addEventListener("click", () => { $("map-card").scrollIntoView({ behavior: "smooth", block: "start" }); map.fitBounds([[41.2887, 2.0726], [41.3036, 2.0790], [BASE.lat, BASE.lng]], { padding: [40, 40] }); });
+
 const markerLayer = L.layerGroup().addTo(map);
 const markers = new Map();
 function drawMarkers() {
