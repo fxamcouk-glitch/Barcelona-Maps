@@ -26,7 +26,7 @@
   <header>
     <div class="eyebrow">Thu 8 – Sun 11 October 2026 · 3 of us</div>
     <h1>Barcelona, <span style="white-space:nowrap">8–11 October</span></h1>
-    <p class="sub">Everything we've been recommended, on one map. Tap a pin for details, or <a href="#add">add somewhere new</a>.</p>
+    <p class="sub">Everything we've been recommended, on one map. Tap a pin for details, or <a href="#add">add somewhere new</a>. Accommodation and boarding passes are <a href="#passes">further down</a>.</p>
     <p class="sub tip" id="a2hs" hidden>Tip: in Safari, tap <strong>Share → Add to Home Screen</strong> to open this like an app.</p>
   </header>
 
@@ -81,6 +81,70 @@
 
   <div id="areas"><div class="empty" id="empty">Loading the list…</div></div>
 
+  <section class="bp-card" id="passes" aria-labelledby="bp-h">
+    <h2 id="bp-h">Stay &amp; boarding passes</h2>
+    <form id="bp-unlock" class="row" novalidate>
+      <p class="hint">Accommodation details and shared passes are behind a trip passcode. Pick one together and share it privately (not in this site).</p>
+      <div class="field grow"><label for="bp-code">Trip passcode</label><input id="bp-code" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="At least 6 characters"></div>
+      <button type="submit" class="btn-main">Unlock</button>
+    </form>
+    <div id="bp-unlocked" class="row unlocked" hidden><span>🔓 Unlocked on this phone.</span><button type="button" class="btn-quiet" id="bp-forget">Lock again</button></div>
+
+    <div class="sub-card" id="stay" hidden>
+      <div class="place-top"><h3>Where we're staying</h3><button type="button" class="btn-quiet" id="stay-edit">Edit</button></div>
+      <div id="stay-view"></div>
+      <form id="stay-form" hidden novalidate>
+        <div class="field"><label for="st-name">Name</label><input id="st-name" maxlength="300" placeholder="e.g. Apartment on Gran Via"></div>
+        <div class="field"><label for="st-address">Address</label><input id="st-address" maxlength="300" placeholder="Street, number, floor and door"></div>
+        <div class="two">
+          <div class="field"><label for="st-checkin">Check-in</label><input id="st-checkin" maxlength="300" placeholder="e.g. Thu 8 Oct from 15:00"></div>
+          <div class="field"><label for="st-checkout">Check-out</label><input id="st-checkout" maxlength="300" placeholder="e.g. Sun 11 Oct by 11:00"></div>
+        </div>
+        <div class="field"><label for="st-access">Getting in</label><textarea id="st-access" maxlength="1000" placeholder="Key box code, which buzzer, where to collect keys"></textarea></div>
+        <div class="two">
+          <div class="field"><label for="st-wifi">Wi-Fi</label><input id="st-wifi" maxlength="300" placeholder="Network and password"></div>
+          <div class="field"><label for="st-contact">Host contact</label><input id="st-contact" maxlength="300" placeholder="Name and phone number"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label for="st-ref">Booking ref</label><input id="st-ref" maxlength="300"></div>
+          <div class="field"><label for="st-link">Booking link</label><input id="st-link" maxlength="300" inputmode="url" placeholder="https://"></div>
+        </div>
+        <div class="field"><label for="st-notes">Notes</label><textarea id="st-notes" maxlength="1000"></textarea></div>
+        <div class="row"><button type="submit" class="btn-main" id="st-save">Save</button><button type="button" class="btn" id="st-cancel">Cancel</button><span class="msg" id="st-msg" role="status"></span></div>
+      </form>
+    </div>
+
+    <div class="sub-card">
+      <h3>Boarding passes</h3>
+      <div class="seg" id="bp-tabs" role="group" aria-label="Where passes are kept">
+        <button type="button" class="s-see" data-w="local" aria-pressed="true">On this phone</button>
+        <button type="button" class="s-see" data-w="shared" aria-pressed="false">Shared with the group</button>
+      </div>
+      <p class="hint" id="bp-where-note"></p>
+      <p class="hint" id="bp-shared-lock" hidden>Enter the trip passcode above to see shared passes.</p>
+      <div id="bp-list" class="bp-list"></div>
+      <form id="bp-add" novalidate>
+        <div class="field"><label for="bp-file">Screenshot or photo of the pass</label><input id="bp-file" type="file" accept="image/*,application/pdf"></div>
+        <div class="two">
+          <div class="field"><label for="bp-who">Whose pass</label><input id="bp-who" maxlength="40" placeholder="e.g. Andrew"></div>
+          <div class="field"><label for="bp-flight">Flight</label><input id="bp-flight" maxlength="12" placeholder="e.g. U2 2051" autocapitalize="characters"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label for="bp-when">Date</label><input id="bp-when" type="date" min="2026-10-01" max="2026-10-31"></div>
+          <div class="field"><label for="bp-leg">Which way</label><select id="bp-leg"><option value="out">Flying out</option><option value="back">Flying home</option></select></div>
+        </div>
+        <div class="row"><button type="submit" class="btn-main" id="bp-save">Save pass</button><span class="msg" id="bp-msg" role="status"></span></div>
+      </form>
+      <p class="hint" id="bp-wallet"><strong>Best at the gate:</strong> if your airline's app or email has an <strong>Add to Apple Wallet</strong> button, use it too. Wallet passes appear on your lock screen near the airport and work with no signal.</p>
+    </div>
+  </section>
+
+  <div class="viewer" id="bp-viewer" hidden role="dialog" aria-modal="true" aria-labelledby="bp-view-title">
+    <div class="viewer-bar"><strong id="bp-view-title">Boarding pass</strong><button type="button" class="btn" id="bp-close">Close</button></div>
+    <div class="viewer-body" id="bp-view-body"></div>
+    <p class="viewer-tip">Turn your screen brightness up for the scanner.</p>
+  </div>
+
   <section class="add-card" id="add" aria-labelledby="add-h">
     <h2 id="add-h">Add a place</h2>
     <p class="hint" id="add-hint">Paste from Google Maps, or type a name and address. It goes on the map for everyone straight away.</p>
@@ -115,5 +179,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script type="module" src="app.js"></script>
+<script type="module" src="passes.js"></script>
 </body>
 </html>

@@ -440,3 +440,5 @@ async function connect() {
   });
 }
 connect();
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(e => console.warn("Offline support unavailable", e));

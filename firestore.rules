@@ -8,6 +8,13 @@ service cloud.firestore {
       allow delete: if true;
       allow create, update: if isPlace(request.resource.data);
     }
+    // Private trip info. The collection name is derived from the trip passcode,
+    // so only someone who knows the passcode can find it.
+    match /{coll}/{docId} {
+      allow read, delete: if coll.matches('passes_[0-9a-f]{24}') || coll.matches('trip_[0-9a-f]{24}');
+      allow create, update: if (coll.matches('passes_[0-9a-f]{24}') && isPass(request.resource.data))
+                            || (coll.matches('trip_[0-9a-f]{24}') && docId == 'stay' && isStay(request.resource.data));
+    }
     match /{document=**} {
       allow read, write: if false;
     }
@@ -24,5 +31,12 @@ service cloud.firestore {
       && (!('link' in d) || (d.link is string && d.link.size() <= 600))
       && (!('addedBy' in d) || (d.addedBy is string && d.addedBy.size() <= 60))
       && (!('editedBy' in d) || (d.editedBy is string && d.editedBy.size() <= 60));
+  }
+  function isPass(d) {
+    return d.keys().hasOnly(['who','flight','when','leg','kind','img','createdAt'])
+      && d.img is string && d.img.size() < 1000000;
+  }
+  function isStay(d) {
+    return d.keys().hasOnly(['name','address','checkin','checkout','access','wifi','contact','ref','link','notes','updatedAt']);
   }
 }
