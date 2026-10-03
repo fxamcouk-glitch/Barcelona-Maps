@@ -467,7 +467,16 @@ async function connect() {
 }
 connect();
 
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(e => console.warn("Offline support unavailable", e));
+/* Offline support. Always check for a newer version of the site, and reload once when one arrives. */
+if ("serviceWorker" in navigator) {
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController && !reloaded) { reloaded = true; location.reload(); } });
+  navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then(reg => {
+    reg.update();
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") reg.update(); });
+  }).catch(e => console.warn("Offline support unavailable", e));
+}
 
 /* Top menu: highlight the section you're looking at, and keep that button in view. */
 (() => {

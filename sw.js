@@ -1,7 +1,7 @@
 /* Lets the site open with no signal (e.g. at the gate) once it has been visited.
    The site's own files: network first, falling back to the saved copy.
    Libraries and fonts: saved copy first. Map tiles: saved as you browse, capped. */
-const SHELL = "bcn-shell-v8", LIBS = "bcn-libs-v2", TILES = "bcn-tiles-v2";
+const SHELL = "bcn-shell-v9", LIBS = "bcn-libs-v2", TILES = "bcn-tiles-v2";
 const FILES = ["./", "index.html", "styles.css", "app.js", "passes.js", "seed.js", "firebase-config.js", "manifest.webmanifest", "apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
@@ -19,7 +19,7 @@ self.addEventListener("fetch", e => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin === location.origin) {
-    e.respondWith(fetch(req).then(r => { if (r.ok) { const copy = r.clone(); caches.open(SHELL).then(c => c.put(req, copy)); } return r; })
+    e.respondWith(fetch(req.url, { cache: "no-cache", credentials: "same-origin" }).then(r => { if (r.ok) { const copy = r.clone(); caches.open(SHELL).then(c => c.put(req, copy)); } return r; })
       .catch(() => caches.match(req, { ignoreSearch: true }).then(r => r || caches.match("index.html"))));
     return;
   }
