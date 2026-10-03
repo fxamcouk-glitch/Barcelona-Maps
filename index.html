@@ -28,7 +28,7 @@
     <div class="eyebrow">Thu 8 – Sun 11 October 2026 · 3 of us</div>
     <h1>Barcelona, <span style="white-space:nowrap">8–11 October</span></h1>
     <p class="sub">Everything we've been recommended, on one map. Tap a pin for details, or <a href="#add">add somewhere new</a>. Accommodation, boarding passes and passport copies are <a href="#passes">further down</a>.</p>
-    <p class="sub tip" id="a2hs" hidden>Tip: in Safari, tap <strong>Share → Add to Home Screen</strong> to open this like an app.</p>
+    <p class="sub tip" id="a2hs" hidden><button type="button" class="btn-a2hs" id="a2hs-btn"><img src="apple-touch-icon.png" alt="" width="22" height="22">Add to your iPhone</button></p>
   </header>
 
   <div class="alert" role="note">
@@ -194,6 +194,35 @@
   <p>The map works, but the shared list isn't connected yet. Paste your Firebase config into <code>firebase-config.js</code>.</p>
 </div>
 
+
+<div class="viewer guide" id="a2hs-guide" hidden role="dialog" aria-modal="true" aria-labelledby="g-title">
+  <div class="viewer-bar"><strong id="g-title">Add to your iPhone</strong><button type="button" class="btn" id="g-close">Close</button></div>
+  <div class="guide-body">
+    <p class="g-note" id="g-not-safari" hidden>Open this page in <strong>Safari</strong> first. Other browsers on iPhone can't add it to the home screen.</p>
+    <ol class="g-steps">
+      <li>
+        <div class="g-art" aria-hidden="true">
+          <div class="phone"><div class="screen"><div class="pg"></div><div class="tb"><span></span><span></span><b><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 11H5v10h14V11h-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></b><span></span><span></span></div></div></div>
+        </div>
+        <div><strong>Tap the Share button</strong><span>The square with an arrow pointing up, in the bar at the bottom of Safari. If you can't see the bar, scroll up a little or tap the bottom of the screen.</span></div>
+      </li>
+      <li>
+        <div class="g-art" aria-hidden="true">
+          <div class="sheet"><div class="row-i">Copy</div><div class="row-i">Add to Reading List</div><div class="row-i hi"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Add to Home Screen</span></div><div class="row-i">Find on Page</div></div>
+        </div>
+        <div><strong>Choose “Add to Home Screen”</strong><span>Scroll down the list that slides up. You may need to tap <em>Edit Actions</em> or <em>More</em> to find it.</span></div>
+      </li>
+      <li>
+        <div class="g-art" aria-hidden="true">
+          <div class="addbar"><span>Cancel</span><b>Home Screen</b><span class="add">Add</span></div>
+          <div class="appicon"><img src="apple-touch-icon.png" alt=""><span>Barcelona</span></div>
+        </div>
+        <div><strong>Tap “Add”</strong><span>Keep the name “Barcelona”. The icon appears on your home screen and opens full-screen like an app.</span></div>
+      </li>
+    </ol>
+    <p class="g-note">Add your passes and passport photos <strong>from the new icon</strong>, not from Safari. They keep separate storage.</p>
+  </div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@maplibre/maplibre-gl-leaflet@0.1.4/leaflet-maplibre-gl.js"></script>

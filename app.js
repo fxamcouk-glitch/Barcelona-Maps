@@ -34,7 +34,16 @@ if (TOUCH) {
   }, { passive: true });
   box.addEventListener("touchend", e => { if (e.touches.length === 0) map.dragging.disable(); }, { passive: true });
 }
-if (IOS && !navigator.standalone) { try { if (!localStorage.getItem("bcn-a2hs")) { $("a2hs").hidden = false; localStorage.setItem("bcn-a2hs", "1"); } } catch (_) {} }
+/* "Add to your iPhone" guide: shown on iPhones that aren't already using the home-screen icon. */
+const STANDALONE = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
+if (IOS && !STANDALONE) {
+  $("a2hs").hidden = false;
+  const notSafari = /CriOS|FxiOS|EdgiOS|OPiOS|GSA\//.test(navigator.userAgent);
+  $("g-not-safari").hidden = !notSafari;
+  const g = $("a2hs-guide");
+  $("a2hs-btn").addEventListener("click", () => { g.hidden = false; document.body.classList.add("noscroll"); $("g-close").focus(); });
+  $("g-close").addEventListener("click", () => { g.hidden = true; document.body.classList.remove("noscroll"); });
+}
 /* A soft, Google-style street map from OpenFreeMap (free, no key). Falls back to the
    standard OpenStreetMap tiles if the phone can't draw vector maps. */
 const OSM_ATTR = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
