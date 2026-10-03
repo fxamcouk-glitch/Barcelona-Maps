@@ -13,7 +13,8 @@ service cloud.firestore {
     match /{coll}/{docId} {
       allow read, delete: if coll.matches('passes_[0-9a-f]{24}') || coll.matches('trip_[0-9a-f]{24}');
       allow create, update: if (coll.matches('passes_[0-9a-f]{24}') && isPass(request.resource.data))
-                            || (coll.matches('trip_[0-9a-f]{24}') && docId == 'stay' && isStay(request.resource.data));
+                            || (coll.matches('trip_[0-9a-f]{24}') && docId == 'stay' && isStay(request.resource.data))
+                            || (coll.matches('trip_[0-9a-f]{24}') && docId == 'flights' && isFlights(request.resource.data));
     }
     match /{document=**} {
       allow read, write: if false;
@@ -38,5 +39,8 @@ service cloud.firestore {
   }
   function isStay(d) {
     return d.keys().hasOnly(['name','address','checkin','checkout','access','wifi','contact','ref','link','notes','updatedAt']);
+  }
+  function isFlights(d) {
+    return d.keys().hasOnly(['out','back','ref','airline','notes','updatedAt']);
   }
 }

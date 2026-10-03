@@ -74,10 +74,12 @@ async function openShared(code) {
     render();
   }, err => { console.error(err); say("Couldn't open the shared passes. Check the passcode and your signal.", true); });
   shared.unsubStay = fs.onSnapshot(stayRef, d => { shared.stay = d.exists() ? d.data() : null; renderStay(); }, err => console.error(err));
+  shared.flRef = fs.doc(db, "trip_" + name.slice(7), "flights");
+  shared.unsubFl = fs.onSnapshot(shared.flRef, d => { shared.flights = d.exists() ? d.data() : null; renderFlights(); }, err => console.error(err));
   renderLock();
 }
 
-function closeShared() { if (shared) { shared.unsub && shared.unsub(); shared.unsubStay && shared.unsubStay(); } shared = null; }
+function closeShared() { if (shared) { shared.unsub && shared.unsub(); shared.unsubStay && shared.unsubStay(); shared.unsubFl && shared.unsubFl(); } shared = null; renderFlights(); }
 
 /* ---------- accommodation ---------- */
 const STAY_FIELDS = [
@@ -89,6 +91,8 @@ function renderLock() {
   $("bp-unlock").hidden = open; $("bp-unlocked").hidden = !open;
   $("stay").hidden = !open;
   if (!open) { $("stay-view").replaceChildren(); }
+  $("fl-locked").hidden = open; $("fl-edit").hidden = !open || !$("fl-form").hidden;
+  if (!open) { $("fl-view").hidden = true; $("fl-form").hidden = true; $("fl-view").replaceChildren(); }
 }
 function renderStay() {
   renderLock();
@@ -174,6 +178,68 @@ function initDocs() {
   if (!$("doc-add")) return;
   $("doc-add").addEventListener("submit", saveDoc);
   renderDocs();
+}
+
+/* ---------- flights ---------- */
+const LEG_FIELDS = ["flight", "date", "from", "dep", "to", "arr", "term"];
+function renderFlights() {
+  const v = $("fl-view"); if (!v) return;
+  renderLock();
+  if (!shared) return;
+  v.replaceChildren(); v.hidden = !$("fl-form").hidden;
+  const f = shared.flights || {};
+  const legs = [["out", "Flying out"], ["back", "Flying home"]].filter(([k]) => f[k] && LEG_FIELDS.some(x => f[k][x]));
+  if (!legs.length && !f.ref) {
+    const e = document.createElement("p"); e.className = "bp-empty"; e.textContent = "No flight details yet. Tap Edit to add the flight numbers and times.";
+    v.appendChild(e); return;
+  }
+  legs.forEach(([k, title]) => {
+    const l = f[k], c = document.createElement("div"); c.className = "fl-card";
+    const top = document.createElement("div"); top.className = "fl-top";
+    const t = document.createElement("span"); t.className = "fl-leg"; t.textContent = title + (l.date ? " · " + fmtDate(l.date) : "");
+    const n = document.createElement("strong"); n.className = "fl-no"; n.textContent = l.flight || "";
+    top.append(t, n);
+    const route = document.createElement("div"); route.className = "fl-route";
+    const end = (place, time) => { const d = document.createElement("div"); const tm = document.createElement("b"); tm.textContent = time || "--:--"; const pl = document.createElement("span"); pl.textContent = place || ""; d.append(tm, pl); return d; };
+    const arrow = document.createElement("div"); arrow.className = "fl-arrow"; arrow.setAttribute("aria-hidden", "true"); arrow.textContent = "✈︎";
+    route.append(end(l.from, l.dep), arrow, end(l.to, l.arr));
+    c.append(top, route);
+    if (l.term) { const tm = document.createElement("p"); tm.className = "fl-term"; tm.textContent = "Terminal: " + l.term; c.appendChild(tm); }
+    if (l.flight) {
+      const code = l.flight.replace(/\s+/g, "").toUpperCase();
+      const links = document.createElement("div"); links.className = "links";
+      const a = document.createElement("a"); a.className = "btn"; a.dataset.i = "plane"; a.target = "_blank"; a.rel = "noopener"; a.textContent = "Track flight";
+      a.href = "https://www.flightradar24.com/data/flights/" + encodeURIComponent(code.toLowerCase());
+      const g = document.createElement("a"); g.className = "btn"; g.dataset.i = "find"; g.target = "_blank"; g.rel = "noopener"; g.textContent = "Flight status";
+      g.href = "https://www.google.com/search?q=" + encodeURIComponent("flight " + code + (l.date ? " " + l.date : ""));
+      links.append(a, g); c.appendChild(links);
+    }
+    v.appendChild(c);
+  });
+  if (f.ref || f.airline || f.notes) {
+    const dl = document.createElement("dl"); dl.className = "facts";
+    [["Airline", f.airline], ["Booking ref", f.ref], ["Notes", f.notes]].forEach(([k, val]) => { if (!val) return; const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = val; dl.append(dt, dd); });
+    v.appendChild(dl);
+  }
+}
+function editFlights(on) {
+  $("fl-form").hidden = !on; $("fl-view").hidden = on; $("fl-edit").hidden = on;
+  if (on) {
+    const f = (shared && shared.flights) || {};
+    ["out", "back"].forEach(k => LEG_FIELDS.forEach(x => { $("fl-" + k + "-" + x).value = (f[k] && f[k][x]) || ""; }));
+    $("fl-ref").value = f.ref || ""; $("fl-airline").value = f.airline || ""; $("fl-notes").value = f.notes || "";
+    $("fl-out-flight").focus();
+  } else renderFlights();
+}
+async function saveFlights(e) {
+  e.preventDefault(); if (!shared) return;
+  const body = { updatedAt: new Date().toISOString() };
+  ["out", "back"].forEach(k => { const l = {}; LEG_FIELDS.forEach(x => { const v = $("fl-" + k + "-" + x).value.trim(); if (v) l[x] = x === "flight" ? v.toUpperCase().slice(0, 12) : v.slice(0, 40); }); if (Object.keys(l).length) body[k] = l; });
+  [["ref", 20], ["airline", 40], ["notes", 1000]].forEach(([k, n]) => { const v = $("fl-" + k).value.trim(); if (v) body[k] = k === "ref" ? v.toUpperCase().slice(0, n) : v.slice(0, n); });
+  $("fl-save").disabled = true; $("fl-msg").textContent = "Saving…";
+  try { await shared.fs.setDoc(shared.flRef, body); $("fl-msg").textContent = ""; editFlights(false); }
+  catch (err) { console.error(err); $("fl-msg").textContent = "Couldn't save. Check your signal and try again."; }
+  finally { $("fl-save").disabled = false; }
 }
 
 /* ---------- UI ---------- */
@@ -283,6 +349,10 @@ async function init() {
   });
   $("bp-forget").addEventListener("click", () => { try { localStorage.removeItem("bcn-pass-code"); } catch (_) {} closeShared(); $("bp-code").value = ""; renderLock(); render(); });
   $("stay-edit").addEventListener("click", () => editStay(true));
+  $("fl-edit").addEventListener("click", () => editFlights(true));
+  $("fl-cancel").addEventListener("click", () => editFlights(false));
+  $("fl-form").addEventListener("submit", saveFlights);
+  $("fl-unlock-link").addEventListener("click", () => setTimeout(() => $("bp-code").focus({ preventScroll: true }), 500));
   $("st-cancel").addEventListener("click", () => editStay(false));
   $("stay-form").addEventListener("submit", saveStay);
   renderLock();
