@@ -26,6 +26,17 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 const icon = (cls, label) => L.divIcon({ className: "", iconSize: [0, 0], html: `<div class="pin ${cls}"><div class="d"></div>${label ? `<div class="t">${esc(label)}</div>` : ""}</div>` });
 L.marker([BASE.lat, BASE.lng], { icon: icon("base", "Base"), keyboard: false, zIndexOffset: 500 }).addTo(map).bindPopup("<b>Base</b>Gran Via, near Passeig de Gràcia");
 
+/* The page's fonts and layout can settle after the map is created, so re-measure
+   whenever the map's box changes size; otherwise only a sliver of streets is drawn. */
+let lastW = 0;
+new ResizeObserver(() => {
+  const w = $("map").clientWidth; if (!w) return;
+  const first = !lastW; lastW = w;
+  map.invalidateSize();
+  if (first && PLACES.length) fitAll();
+}).observe($("map"));
+window.addEventListener("load", () => { map.invalidateSize(); if (PLACES.length) fitAll(); });
+
 const markerLayer = L.layerGroup().addTo(map);
 const markers = new Map();
 function drawMarkers() {
