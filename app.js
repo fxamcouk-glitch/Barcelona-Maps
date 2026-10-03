@@ -468,3 +468,26 @@ async function connect() {
 connect();
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(e => console.warn("Offline support unavailable", e));
+
+/* Top menu: highlight the section you're looking at, and keep that button in view. */
+(() => {
+  const btns = [...document.querySelectorAll(".nav-btn")];
+  const secs = btns.map(b => document.getElementById(b.dataset.sec)).filter(Boolean);
+  let current = null;
+  const setCurrent = id => {
+    if (id === current) return; current = id;
+    btns.forEach(b => { const on = b.dataset.sec === id; b.setAttribute("aria-current", on ? "true" : "false");
+      if (on) { const row = b.parentElement, l = b.offsetLeft - 16, r = b.offsetLeft + b.offsetWidth - row.clientWidth + 36;
+        if (row.scrollLeft > l) row.scrollTo({ left: l, behavior: "smooth" }); else if (row.scrollLeft < r) row.scrollTo({ left: r, behavior: "smooth" }); } });
+  };
+  const pick = () => {
+    const line = (document.getElementById("topnav")?.offsetHeight || 60) + 24;
+    let best = null;
+    for (const s of secs) { if (s.hidden || !s.offsetParent) continue; if (s.getBoundingClientRect().top <= line) best = s.id; }
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) best = secs[secs.length - 1].id;
+    setCurrent(best);
+  };
+  let raf; addEventListener("scroll", () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(pick); }, { passive: true });
+  addEventListener("resize", pick); setTimeout(pick, 300);
+})();
+
