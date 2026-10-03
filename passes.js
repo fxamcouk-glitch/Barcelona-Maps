@@ -133,6 +133,49 @@ async function saveStay(e) {
   finally { $("st-save").disabled = false; }
 }
 
+/* ---------- travel documents (this phone only, never uploaded) ---------- */
+function renderDocs() {
+  const list = $("doc-list"); if (!list) return; list.replaceChildren();
+  const items = LOCAL.filter(p => p.cat === "doc").sort((a, b) => (a.who || "").localeCompare(b.who || "") || (a.label || "").localeCompare(b.label || ""));
+  if (!items.length) { const e = document.createElement("p"); e.className = "bp-empty"; e.textContent = "No documents saved on this phone yet."; list.appendChild(e); return; }
+  items.forEach(p => {
+    const row = document.createElement("div"); row.className = "bp-item";
+    const th = document.createElement("button"); th.type = "button"; th.className = "bp-thumb"; th.setAttribute("aria-label", "Open " + (p.label || "document"));
+    if (p.kind === "pdf") { th.textContent = "PDF"; } else { const im = document.createElement("img"); im.alt = ""; im.src = p.img; th.appendChild(im); }
+    th.addEventListener("click", () => openPass({ ...p, flight: p.label }));
+    const info = document.createElement("div"); info.className = "bp-info";
+    const t = document.createElement("strong"); t.textContent = p.label || "Document";
+    const s = document.createElement("span"); s.textContent = p.who || "";
+    info.append(t, s);
+    const del = document.createElement("button"); del.type = "button"; del.className = "btn-quiet"; del.textContent = "Remove";
+    del.addEventListener("click", async () => {
+      if (!del.classList.contains("confirm")) { del.classList.add("confirm"); del.textContent = "Tap again"; setTimeout(() => { del.classList.remove("confirm"); del.textContent = "Remove"; }, 3000); return; }
+      try { await localDel(p.id); LOCAL = await localAll(); renderDocs(); } catch (e) { $("doc-msg").textContent = "Couldn't remove it."; }
+    });
+    row.append(th, info, del); list.appendChild(row);
+  });
+}
+async function saveDoc(e) {
+  e.preventDefault();
+  const file = $("doc-file").files[0], m = $("doc-msg");
+  if (!file) { m.className = "msg err"; m.textContent = "Choose a photo or PDF first."; return; }
+  const rec = { id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), cat: "doc",
+    label: $("doc-label").value.trim().slice(0, 60) || "Passport", who: $("doc-who").value.trim().slice(0, 40), createdAt: new Date().toISOString() };
+  $("doc-save").disabled = true; m.className = "msg"; m.textContent = "Saving…";
+  try {
+    if (file.type === "application/pdf" || /\.pdf$/i.test(file.name)) { rec.kind = "pdf"; rec.blob = file; }
+    else { rec.kind = "img"; rec.img = await toJpegDataUrl(file, 3000000); }
+    await localPut(rec); LOCAL = await localAll(); renderDocs();
+    $("doc-add").reset(); m.textContent = "Saved on this phone.";
+  } catch (err) { console.error(err); m.className = "msg err"; m.textContent = "Couldn't save it. Try a smaller photo."; }
+  finally { $("doc-save").disabled = false; }
+}
+function initDocs() {
+  if (!$("doc-add")) return;
+  $("doc-add").addEventListener("submit", saveDoc);
+  renderDocs();
+}
+
 /* ---------- UI ---------- */
 let LOCAL = [], where = "local";
 const msg = () => $("bp-msg");
@@ -140,7 +183,7 @@ function say(t, err) { const m = msg(); m.className = "msg" + (err ? " err" : ""
 
 function render() {
   const list = $("bp-list"); list.replaceChildren();
-  const items = (where === "local" ? LOCAL : (shared ? shared.list : []))
+  const items = (where === "local" ? LOCAL.filter(p => p.cat !== "doc") : (shared ? shared.list : []))
     .slice().sort((a, b) => (a.when || "").localeCompare(b.when || "") || (a.who || "").localeCompare(b.who || ""));
   $("bp-shared-lock").hidden = where !== "shared" || !!shared;
   $("bp-add").hidden = where === "shared" && !shared;
@@ -245,6 +288,7 @@ async function init() {
   renderLock();
   if (!IOS) $("bp-wallet").hidden = true;
   try { LOCAL = await localAll(); } catch (e) { LOCAL = []; }
+  initDocs();
   let saved = null; try { saved = localStorage.getItem("bcn-pass-code"); } catch (_) {}
   if (saved) { $("bp-code").value = saved; openShared(saved).catch(() => {}); }
   setWhere("local");

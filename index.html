@@ -27,7 +27,7 @@
   <header>
     <div class="eyebrow">Thu 8 – Sun 11 October 2026 · 3 of us</div>
     <h1>Barcelona, <span style="white-space:nowrap">8–11 October</span></h1>
-    <p class="sub">Everything we've been recommended, on one map. Tap a pin for details, or <a href="#add">add somewhere new</a>. Accommodation and boarding passes are <a href="#passes">further down</a>.</p>
+    <p class="sub">Everything we've been recommended, on one map. Tap a pin for details, or <a href="#add">add somewhere new</a>. Accommodation, boarding passes and passport copies are <a href="#passes">further down</a>.</p>
     <p class="sub tip" id="a2hs" hidden>Tip: in Safari, tap <strong>Share → Add to Home Screen</strong> to open this like an app.</p>
   </header>
 
@@ -138,6 +138,22 @@
       </form>
       <p class="hint" id="bp-wallet"><strong>Best at the gate:</strong> if your airline's app or email has an <strong>Add to Apple Wallet</strong> button, use it too. Wallet passes appear on your lock screen near the airport and work with no signal.</p>
     </div>
+  </section>
+
+  <section class="bp-card" id="docs" aria-labelledby="doc-h">
+    <div class="place-top"><h2 id="doc-h">Passports &amp; documents</h2><span class="tag book">This phone only</span></div>
+    <p class="hint">Photos of passports, GHIC cards or travel insurance, kept as a backup in case the originals go missing. These are saved only on this phone. They're never uploaded or shared, and they open with no signal. Each of you adds your own on your own phone.</p>
+    <div id="doc-list" class="bp-list"></div>
+    <form id="doc-add" novalidate>
+      <div class="field"><label for="doc-file">Photo or PDF</label><input id="doc-file" type="file" accept="image/*,application/pdf"></div>
+      <div class="two">
+        <div class="field"><label for="doc-label">What is it</label><input id="doc-label" maxlength="60" placeholder="e.g. Passport" list="doc-kinds"></div>
+        <div class="field"><label for="doc-who">Whose</label><input id="doc-who" maxlength="40" placeholder="e.g. Andrew"></div>
+      </div>
+      <datalist id="doc-kinds"><option value="Passport"><option value="GHIC card"><option value="Travel insurance"><option value="Driving licence"></datalist>
+      <div class="row"><button type="submit" class="btn-main" id="doc-save">Save on this phone</button><span class="msg" id="doc-msg" role="status"></span></div>
+    </form>
+    <p class="hint">If you lose your passport abroad, contact the nearest British Consulate. Barcelona has one, and a photo of the photo page speeds things up.</p>
   </section>
 
   <div class="viewer" id="bp-viewer" hidden role="dialog" aria-modal="true" aria-labelledby="bp-view-title">
