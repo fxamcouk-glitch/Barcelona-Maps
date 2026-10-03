@@ -110,10 +110,10 @@ function renderStay() {
   v.appendChild(dl);
   if (st.address) {
     const links = document.createElement("div"); links.className = "links";
-    const g = document.createElement("a"); g.className = "btn"; g.target = "_blank"; g.rel = "noopener"; g.textContent = "Open in Google Maps";
+    const g = document.createElement("a"); g.className = "btn"; g.target = "_blank"; g.rel = "noopener"; g.textContent = "Google Maps"; g.dataset.i = "maps";
     g.href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(st.address);
     links.appendChild(g);
-    if (IOS) { const ap = document.createElement("a"); ap.className = "btn"; ap.target = "_blank"; ap.rel = "noopener"; ap.textContent = "Apple Maps"; ap.href = "https://maps.apple.com/?q=" + encodeURIComponent(st.address); links.appendChild(ap); }
+    if (IOS) { const ap = document.createElement("a"); ap.className = "btn"; ap.target = "_blank"; ap.rel = "noopener"; ap.textContent = "Apple Maps"; ap.dataset.i = "apple"; ap.href = "https://maps.apple.com/?q=" + encodeURIComponent(st.address); links.appendChild(ap); }
     v.appendChild(links);
   }
 }
@@ -147,7 +147,7 @@ function renderDocs() {
     const t = document.createElement("strong"); t.textContent = p.label || "Document";
     const s = document.createElement("span"); s.textContent = p.who || "";
     info.append(t, s);
-    const del = document.createElement("button"); del.type = "button"; del.className = "btn-quiet"; del.textContent = "Remove";
+    const del = document.createElement("button"); del.type = "button"; del.className = "btn-quiet"; del.textContent = "Remove"; del.dataset.i = "del";
     del.addEventListener("click", async () => {
       if (!del.classList.contains("confirm")) { del.classList.add("confirm"); del.textContent = "Tap again"; setTimeout(() => { del.classList.remove("confirm"); del.textContent = "Remove"; }, 3000); return; }
       try { await localDel(p.id); LOCAL = await localAll(); renderDocs(); } catch (e) { $("doc-msg").textContent = "Couldn't remove it."; }
@@ -203,7 +203,7 @@ function render() {
     const t = document.createElement("strong"); t.textContent = [p.who, p.flight].filter(Boolean).join(" · ") || "Boarding pass";
     const s = document.createElement("span"); s.textContent = [p.leg === "back" ? "Flying home" : "Flying out", p.when ? fmtDate(p.when) : ""].filter(Boolean).join(" · ");
     info.append(t, s);
-    const del = document.createElement("button"); del.type = "button"; del.className = "btn-quiet"; del.textContent = "Remove";
+    const del = document.createElement("button"); del.type = "button"; del.className = "btn-quiet"; del.textContent = "Remove"; del.dataset.i = "del";
     del.addEventListener("click", async () => {
       if (!del.classList.contains("confirm")) { del.classList.add("confirm"); del.textContent = "Tap again"; setTimeout(() => { del.classList.remove("confirm"); del.textContent = "Remove"; }, 3000); return; }
       try {
@@ -221,7 +221,7 @@ function openPass(p) {
   body.replaceChildren();
   if (p.kind === "pdf") {
     const blob = p.blob instanceof Blob ? p.blob : null;
-    if (blob) { const u = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = u; a.target = "_blank"; a.rel = "noopener"; a.className = "btn-main"; a.textContent = "Open the PDF"; body.appendChild(a); }
+    if (blob) { const u = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = u; a.target = "_blank"; a.rel = "noopener"; a.className = "btn-main"; a.textContent = "Open the PDF"; a.dataset.i = "pdf"; body.appendChild(a); }
   } else { const im = document.createElement("img"); im.src = p.img; im.alt = "Boarding pass"; body.appendChild(im); }
   $("bp-view-title").textContent = [p.who, p.flight].filter(Boolean).join(" · ") || "Boarding pass";
   v.hidden = false; document.body.classList.add("noscroll");

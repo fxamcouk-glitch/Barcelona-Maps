@@ -33,10 +33,9 @@
 
 
   <div class="filters" role="group" aria-label="Filter places">
-    <button class="chip" data-f="all" aria-pressed="true">Everything</button>
-    <button class="chip" data-f="see" aria-pressed="false">See</button>
-    <button class="chip" data-f="eat" aria-pressed="false">Eat &amp; drink</button>
-    <button class="chip" data-f="book" aria-pressed="false">Needs booking</button>
+    <button class="chip" data-i="all" data-f="all" aria-pressed="true">Everything</button>
+    <button class="chip" data-i="see" data-f="see" aria-pressed="false">See</button>
+    <button class="chip" data-i="eat" data-f="eat" aria-pressed="false">Eat &amp; drink</button>
   </div>
 
   <div class="map-card" id="map-card">
@@ -47,7 +46,7 @@
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"/><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <span id="loc-label">Show where I am</span>
       </button>
-      <button type="button" class="btn" id="fit-btn">Show all places</button>
+      <button type="button" class="btn" data-i="fit" id="fit-btn">Show all places</button>
       <span class="legend"><span class="dot" style="background:#16202e"></span>Your stay</span>
       <span class="legend"><span class="dot" style="background:#e07a9a"></span>See</span>
       <span class="legend"><span class="dot" style="background:#e3a320"></span>Eat &amp; drink</span>
@@ -69,10 +68,10 @@
       <dt>Taxi</dt><dd>About 25–30 minutes from the rank outside arrivals.</dd>
     </dl>
     <div class="links">
-      <a class="btn primary" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=Barcelona+Airport+Terminal+1&destination=41.3978,2.1643&travelmode=transit">Airport to our stay</a>
-      <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=41.3978,2.1643&destination=Barcelona+Airport+Terminal+1&travelmode=transit">Our stay to airport</a>
-      <a class="btn" target="_blank" rel="noopener" href="https://www.aerobusbcn.com/en">Aerobús times &amp; tickets</a>
-      <button type="button" class="btn-quiet" id="air-show">Show on map</button>
+      <a class="btn primary" data-i="home" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=Barcelona+Airport+Terminal+1&destination=41.3978,2.1643&travelmode=transit">Airport to our stay</a>
+      <a class="btn" data-i="plane" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=41.3978,2.1643&destination=Barcelona+Airport+Terminal+1&travelmode=transit">Our stay to airport</a>
+      <a class="btn" data-i="bus" target="_blank" rel="noopener" href="https://www.aerobusbcn.com/en">Aerobús times &amp; tickets</a>
+      <button type="button" class="btn-quiet" data-i="show" id="air-show">Show on map</button>
     </div>
   </section>
 
@@ -83,12 +82,12 @@
     <form id="bp-unlock" class="row" novalidate>
       <p class="hint">Accommodation details and shared passes are behind a trip passcode. Pick one together and share it privately (not in this site).</p>
       <div class="field grow"><label for="bp-code">Trip passcode</label><input id="bp-code" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="At least 6 characters"></div>
-      <button type="submit" class="btn-main">Unlock</button>
+      <button type="submit" class="btn-main" data-i="unlock">Unlock</button>
     </form>
-    <div id="bp-unlocked" class="row unlocked" hidden><span>🔓 Unlocked on this phone.</span><button type="button" class="btn-quiet" id="bp-forget">Lock again</button></div>
+    <div id="bp-unlocked" class="row unlocked" hidden><span>Unlocked on this phone.</span><button type="button" class="btn-quiet" data-i="lock" id="bp-forget">Lock again</button></div>
 
     <div class="sub-card" id="stay" hidden>
-      <div class="place-top"><h3>Where we're staying</h3><button type="button" class="btn-quiet" id="stay-edit">Edit</button></div>
+      <div class="place-top"><h3>Where we're staying</h3><button type="button" class="btn-quiet" data-i="edit" id="stay-edit">Edit</button></div>
       <div id="stay-view"></div>
       <form id="stay-form" hidden novalidate>
         <div class="field"><label for="st-name">Name</label><input id="st-name" maxlength="300" placeholder="e.g. Apartment near Diagonal"></div>
@@ -107,15 +106,15 @@
           <div class="field"><label for="st-link">Booking link</label><input id="st-link" maxlength="300" inputmode="url" placeholder="https://"></div>
         </div>
         <div class="field"><label for="st-notes">Notes</label><textarea id="st-notes" maxlength="1000"></textarea></div>
-        <div class="row"><button type="submit" class="btn-main" id="st-save">Save</button><button type="button" class="btn" id="st-cancel">Cancel</button><span class="msg" id="st-msg" role="status"></span></div>
+        <div class="row"><button type="submit" class="btn-main" data-i="save" id="st-save">Save</button><button type="button" class="btn" data-i="close" id="st-cancel">Cancel</button><span class="msg" id="st-msg" role="status"></span></div>
       </form>
     </div>
 
     <div class="sub-card">
       <h3>Boarding passes</h3>
       <div class="seg" id="bp-tabs" role="group" aria-label="Where passes are kept">
-        <button type="button" class="s-see" data-w="local" aria-pressed="true">On this phone</button>
-        <button type="button" class="s-see" data-w="shared" aria-pressed="false">Shared with the group</button>
+        <button type="button" class="s-see" data-i="phone" data-w="local" aria-pressed="true">On this phone</button>
+        <button type="button" class="s-see" data-i="group" data-w="shared" aria-pressed="false">Shared with the group</button>
       </div>
       <p class="hint" id="bp-where-note"></p>
       <p class="hint" id="bp-shared-lock" hidden>Enter the trip passcode above to see shared passes.</p>
@@ -130,7 +129,7 @@
           <div class="field"><label for="bp-when">Date</label><input id="bp-when" type="date" min="2026-10-01" max="2026-10-31"></div>
           <div class="field"><label for="bp-leg">Which way</label><select id="bp-leg"><option value="out">Flying out</option><option value="back">Flying home</option></select></div>
         </div>
-        <div class="row"><button type="submit" class="btn-main" id="bp-save">Save pass</button><span class="msg" id="bp-msg" role="status"></span></div>
+        <div class="row"><button type="submit" class="btn-main" data-i="save" id="bp-save">Save pass</button><span class="msg" id="bp-msg" role="status"></span></div>
       </form>
       <p class="hint" id="bp-wallet"><strong>Best at the gate:</strong> if your airline's app or email has an <strong>Add to Apple Wallet</strong> button, use it too. Wallet passes appear on your lock screen near the airport and work with no signal.</p>
     </div>
@@ -147,13 +146,13 @@
         <div class="field"><label for="doc-who">Whose</label><input id="doc-who" maxlength="40" placeholder="e.g. Andrew"></div>
       </div>
       <datalist id="doc-kinds"><option value="Passport"><option value="GHIC card"><option value="Travel insurance"><option value="Driving licence"></datalist>
-      <div class="row"><button type="submit" class="btn-main" id="doc-save">Save on this phone</button><span class="msg" id="doc-msg" role="status"></span></div>
+      <div class="row"><button type="submit" class="btn-main" data-i="save" id="doc-save">Save on this phone</button><span class="msg" id="doc-msg" role="status"></span></div>
     </form>
     <p class="hint">If you lose your passport abroad, contact the nearest British Consulate. Barcelona has one, and a photo of the photo page speeds things up.</p>
   </section>
 
   <div class="viewer" id="bp-viewer" hidden role="dialog" aria-modal="true" aria-labelledby="bp-view-title">
-    <div class="viewer-bar"><strong id="bp-view-title">Boarding pass</strong><button type="button" class="btn" id="bp-close">Close</button></div>
+    <div class="viewer-bar"><strong id="bp-view-title">Boarding pass</strong><button type="button" class="btn" data-i="close" id="bp-close">Close</button></div>
     <div class="viewer-body" id="bp-view-body"></div>
     <p class="viewer-tip">Turn your screen brightness up for the scanner.</p>
   </div>
@@ -167,18 +166,18 @@
       <div class="field"><label for="a-name">Name</label><input id="a-name" maxlength="100" placeholder="e.g. Bunkers del Carmel" autocomplete="off"></div>
       <div class="field"><span class="lab">What is it</span>
         <div class="seg" role="group" aria-label="Type">
-          <button type="button" class="s-see" data-t="see" aria-pressed="true">See</button>
-          <button type="button" class="s-eat" data-t="eat" aria-pressed="false">Eat &amp; drink</button>
+          <button type="button" class="s-see" data-i="see" data-t="see" aria-pressed="true">See</button>
+          <button type="button" class="s-eat" data-i="eat" data-t="eat" aria-pressed="false">Eat &amp; drink</button>
         </div>
       </div>
       <div class="field"><label for="a-addr">Address</label><input id="a-addr" maxlength="300" placeholder="e.g. Carrer de Marià Lavèrnia, Barcelona" autocomplete="off">
-        <div class="row"><button type="button" class="btn" id="a-find">Find it on the map</button><button type="button" class="btn" id="a-pick">Or tap the map</button></div>
+        <div class="row"><button type="button" class="btn" data-i="find" id="a-find">Find it on the map</button><button type="button" class="btn" data-i="tap" id="a-pick">Or tap the map</button></div>
         <div class="loc-status" id="a-loc">No pin yet.</div>
       </div>
       <div class="field"><label for="a-note">Why go</label><textarea id="a-note" maxlength="1000" placeholder="A line or two: what it is, when to go"></textarea></div>
       <div class="field"><label for="a-from">Tip from (optional)</label><input id="a-from" maxlength="200" placeholder="Who recommended it, e.g. Spanish friend" autocomplete="off"></div>
       <div class="field"><label for="a-who">Your name</label><input id="a-who" maxlength="60" placeholder="So the others know who added it" autocomplete="given-name"></div>
-      <div class="row"><button type="submit" class="btn-main" id="a-save">Add to the map</button><button type="button" class="btn" id="a-cancel" hidden>Cancel</button><span class="msg" id="a-msg" role="status"></span></div>
+      <div class="row"><button type="submit" class="btn-main" data-i="add" id="a-save">Add to the map</button><button type="button" class="btn" data-i="close" id="a-cancel" hidden>Cancel</button><span class="msg" id="a-msg" role="status"></span></div>
     </form>
   </section>
 
@@ -192,7 +191,7 @@
 
 
 <div class="viewer guide" id="a2hs-guide" hidden role="dialog" aria-modal="true" aria-labelledby="g-title">
-  <div class="viewer-bar"><strong id="g-title">Add to your iPhone</strong><button type="button" class="btn" id="g-close">Close</button></div>
+  <div class="viewer-bar"><strong id="g-title">Add to your iPhone</strong><button type="button" class="btn" data-i="close" id="g-close">Close</button></div>
   <div class="guide-body">
     <p class="g-note" id="g-not-safari" hidden>Open this page in <strong>Safari</strong> first. Other browsers on iPhone can't add it to the home screen.</p>
     <ol class="g-steps">

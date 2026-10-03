@@ -95,7 +95,7 @@ function drawMarkers() {
     const div = document.createElement("div");
     const b = document.createElement("b"); b.textContent = p.name;
     const sm = document.createElement("span"); sm.textContent = p.type === "eat" ? "Eat & drink" : "See";
-    const go = document.createElement("button"); go.type = "button"; go.textContent = "Details ↓";
+    const go = document.createElement("button"); go.type = "button"; go.textContent = "Details"; go.dataset.i = "details";
     go.addEventListener("click", () => { map.closePopup(); focusCard(p.id); });
     div.append(b, sm, document.createElement("br"), go);
     m.bindPopup(div);
@@ -230,17 +230,17 @@ function card(p) {
   fact("Address", p.address); fact("Open", p.hours); fact("From our stay", walkLabel(distM(BASE, p))); fact("Tip from", p.from); fact("Added by", p.addedBy);
   if (dl.children.length) c.appendChild(dl);
   const links = document.createElement("div"); links.className = "links";
-  const a = (t, href, cls) => { const x = document.createElement("a"); x.className = "btn " + (cls || ""); x.href = href; x.target = "_blank"; x.rel = "noopener"; x.textContent = t; links.appendChild(x); };
-  a("Open in Google Maps", mapsUrl(p), "primary");
-  a("Directions from our stay", dirUrl(p, BASE, "transit"));
-  if (IOS) a("Apple Maps", appleUrl(p, BASE, "r"));
-  if (p.bookUrl) a("Book", p.bookUrl, "bookbtn");
-  const show = document.createElement("button"); show.type = "button"; show.className = "btn-quiet"; show.textContent = "Show on map";
+  const a = (t, href, cls, ic) => { const x = document.createElement("a"); x.className = "btn " + (cls || ""); if (ic) x.dataset.i = ic; x.href = href; x.target = "_blank"; x.rel = "noopener"; x.textContent = t; links.appendChild(x); };
+  a("Google Maps", mapsUrl(p), "primary", "maps");
+  a("Directions from our stay", dirUrl(p, BASE, "transit"), "", "dir");
+  if (IOS) a("Apple Maps", appleUrl(p, BASE, "r"), "", "apple");
+  if (p.bookUrl) a("Book", p.bookUrl, "bookbtn", "book");
+  const show = document.createElement("button"); show.type = "button"; show.className = "btn-quiet"; show.textContent = "Show on map"; show.dataset.i = "show";
   show.addEventListener("click", () => focusPlace(p.id, true)); links.appendChild(show);
   if (store) {
-    const ed = document.createElement("button"); ed.type = "button"; ed.className = "btn-quiet"; ed.textContent = "Edit";
+    const ed = document.createElement("button"); ed.type = "button"; ed.className = "btn-quiet"; ed.textContent = "Edit"; ed.dataset.i = "edit";
     ed.addEventListener("click", () => startEdit(p.id)); links.appendChild(ed);
-    const del = document.createElement("button"); del.type = "button"; del.className = "btn-quiet"; del.textContent = "Remove";
+    const del = document.createElement("button"); del.type = "button"; del.className = "btn-quiet"; del.textContent = "Remove"; del.dataset.i = "del";
     del.addEventListener("click", async () => {
       if (!del.classList.contains("confirm")) { del.classList.add("confirm"); del.textContent = "Tap again to remove"; setTimeout(() => { del.classList.remove("confirm"); del.textContent = "Remove"; }, 3000); return; }
       del.disabled = true;
