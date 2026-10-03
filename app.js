@@ -468,13 +468,37 @@ async function connect() {
 connect();
 
 /* Offline support. Always check for a newer version of the site, and reload once when one arrives. */
+/* Every button press (at most every 15 seconds) checks for a newer version of the site.
+   A new version reloads the page straight away, unless someone is mid-way through a form or
+   viewing a pass; then a Refresh button appears instead. Shared data is already live. */
 if ("serviceWorker" in navigator) {
   const hadController = !!navigator.serviceWorker.controller;
   let reloaded = false;
-  navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController && !reloaded) { reloaded = true; location.reload(); } });
+  const busy = () => {
+    const a = document.activeElement;
+    if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return true;
+    if (document.querySelector(".viewer:not([hidden])")) return true;
+    if (["fl-form", "stay-form"].some(id => { const f = document.getElementById(id); return f && !f.hidden; })) return true;
+    return [...document.querySelectorAll("#add-form input:not(#a-who), #add-form textarea, #bp-add input, #doc-add input")]
+      .some(el => el.type === "file" ? el.files && el.files.length : el.value.trim());
+  };
+  const showUpdate = () => {
+    if (document.getElementById("upd")) return;
+    const b = document.createElement("button"); b.id = "upd"; b.type = "button"; b.className = "upd"; b.dataset.i = "save";
+    b.textContent = "New version ready · Refresh";
+    b.addEventListener("click", () => location.reload());
+    document.body.appendChild(b);
+  };
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!hadController || reloaded) return;
+    if (busy()) showUpdate(); else { reloaded = true; location.reload(); }
+  });
   navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then(reg => {
-    reg.update();
-    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") reg.update(); });
+    let last = Date.now();
+    const check = () => { if (Date.now() - last < 15000) return; last = Date.now(); reg.update().catch(() => {}); };
+    reg.update().catch(() => {});
+    document.addEventListener("click", e => { if (e.target.closest("button, a, [role=button]")) check(); }, true);
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") { last = 0; check(); } });
   }).catch(e => console.warn("Offline support unavailable", e));
 }
 

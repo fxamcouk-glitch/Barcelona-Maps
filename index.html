@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css">
-<link rel="stylesheet" href="styles.css?v=15">
+<link rel="stylesheet" href="styles.css?v=16">
 </head>
 <body>
 <nav class="topnav" id="topnav" aria-label="Sections"><div class="topnav-in"><a href="#map-card" data-sec="map-card" class="nav-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>Map</span></a><a href="#flights" data-sec="flights" class="nav-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9a2 2 0 0 0 0 4v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3a2 2 0 0 0 0-4V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 5v12" stroke="currentColor" stroke-width="2" stroke-dasharray="2 2.5"/></svg><span>Flights</span></a><a href="#airport" data-sec="airport" class="nav-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" fill="currentColor"/></svg><span>Airport</span></a><a href="#areas" data-sec="areas" class="nav-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="9" r="2.5" fill="currentColor"/></svg><span>Places</span></a><a href="#passes" data-sec="passes" class="nav-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3z" fill="currentColor"/></svg><span>Stay &amp; passes</span></a><a href="#docs" data-sec="docs" class="nav-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Passports</span></a><a href="#add" data-sec="add" class="nav-btn primary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span>Add place</span></a></div></nav>
@@ -61,8 +61,8 @@
 
   <section class="bp-card" id="flights" aria-labelledby="fl-h">
     <div class="place-top"><h2 id="fl-h">Flights</h2><button type="button" class="btn-quiet" data-i="edit" id="fl-edit" hidden>Edit</button></div>
-    <div id="fl-locked" class="row"><p class="hint">Flight details include the booking reference, so they're behind the trip passcode.</p><a class="btn" data-i="unlock" href="#passes" id="fl-unlock-link">Enter passcode</a></div>
-    <div id="fl-view" class="fl-grid" hidden></div>
+    <div id="fl-view" class="fl-grid"></div>
+    <div id="fl-locked" class="row"><p class="hint">Booking references and notes are behind the trip passcode.</p><a class="btn" data-i="unlock" href="#passes" id="fl-unlock-link">Enter passcode</a></div>
     <form id="fl-form" hidden novalidate>
         <fieldset class="leg-fs"><legend>Flying out</legend>
           <div class="two">
@@ -77,7 +77,7 @@
             <div class="field"><label for="fl-out-to">To</label><input id="fl-out-to" maxlength="40" placeholder="e.g. Barcelona (BCN)"></div>
             <div class="field"><label for="fl-out-arr">Arrives</label><input id="fl-out-arr" type="time"></div>
           </div>
-          <div class="field"><label for="fl-out-term">Terminal</label><input id="fl-out-term" maxlength="30" placeholder="e.g. BCN T2"></div>
+          <div class="two"><div class="field"><label for="fl-out-airline">Airline</label><input id="fl-out-airline" maxlength="40"></div><div class="field"><label for="fl-out-term">Terminal</label><input id="fl-out-term" maxlength="40" placeholder="e.g. BCN T2"></div></div>
         </fieldset>
         <fieldset class="leg-fs"><legend>Flying home</legend>
           <div class="two">
@@ -92,11 +92,11 @@
             <div class="field"><label for="fl-back-to">To</label><input id="fl-back-to" maxlength="40" placeholder="e.g. Barcelona (BCN)"></div>
             <div class="field"><label for="fl-back-arr">Arrives</label><input id="fl-back-arr" type="time"></div>
           </div>
-          <div class="field"><label for="fl-back-term">Terminal</label><input id="fl-back-term" maxlength="30" placeholder="e.g. BCN T2"></div>
+          <div class="two"><div class="field"><label for="fl-back-airline">Airline</label><input id="fl-back-airline" maxlength="40"></div><div class="field"><label for="fl-back-term">Terminal</label><input id="fl-back-term" maxlength="40" placeholder="e.g. BCN T2"></div></div>
         </fieldset>
         <div class="two">
-          <div class="field"><label for="fl-ref">Booking ref</label><input id="fl-ref" maxlength="20" autocapitalize="characters"></div>
-          <div class="field"><label for="fl-airline">Airline</label><input id="fl-airline" maxlength="40" placeholder="e.g. easyJet"></div>
+          <div class="field"><label for="fl-ref">Booking ref (out)</label><input id="fl-ref" maxlength="20" autocapitalize="characters"></div>
+          <div class="field"><label for="fl-ref2">Booking ref (home)</label><input id="fl-ref2" maxlength="20" autocapitalize="characters"></div>
         </div>
         <div class="field"><label for="fl-notes">Notes</label><textarea id="fl-notes" maxlength="1000" placeholder="Bags, check-in times, seats"></textarea></div>
         <div class="row"><button type="submit" class="btn-main" data-i="save" id="fl-save">Save</button><button type="button" class="btn" data-i="close" id="fl-cancel">Cancel</button><span class="msg" id="fl-msg" role="status"></span></div>
@@ -105,10 +105,11 @@
 
   <section class="travel-card" id="airport" aria-labelledby="air-h">
     <div class="place-top"><h2 id="air-h">✈︎ Barcelona Airport (BCN)</h2><span class="tag travel">Getting there</span></div>
-    <p class="note">El Prat has two terminals, about 4 km apart, with a free shuttle bus between them. Check your boarding pass for T1 or T2.</p>
+    <p class="note">El Prat has two terminals, about 4 km apart, with a free shuttle bus between them. Vueling normally uses <strong>T1</strong> (our flight in) and Ryanair normally uses <strong>T2</strong> (our flight home), but check your boarding pass.</p>
     <dl class="facts">
       <dt>Easiest</dt><dd><strong>Aerobús</strong> from either terminal to Plaça Catalunya (about 35 minutes, every few minutes; pay on board by card or online). Then two stops on the L3 to Diagonal, or a 20-minute walk up Passeig de Gràcia.</dd>
       <dt>Cheaper</dt><dd>Train R2 Nord from T2 to Passeig de Gràcia, about 25 minutes, then one stop on the L3 or L5 to Diagonal. From T1, take the shuttle to T2 first.</dd>
+      <dt>Going home</dt><dd>Ryanair FR6822 leaves at 19:30 on Sunday. Leave our stay by about <strong>16:45</strong>: that gets you to T2 around 17:45, with time for security before the gate closes 30 minutes before departure.</dd>
       <dt>Taxi</dt><dd>About 25–30 minutes from the rank outside arrivals.</dd>
     </dl>
     <div class="links">
@@ -265,7 +266,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@maplibre/maplibre-gl-leaflet@0.1.4/leaflet-maplibre-gl.js"></script>
-<script type="module" src="app.js?v=15"></script>
-<script type="module" src="passes.js?v=15"></script>
+<script type="module" src="app.js?v=16"></script>
+<script type="module" src="passes.js?v=16"></script>
 </body>
 </html>

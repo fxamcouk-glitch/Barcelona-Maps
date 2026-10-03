@@ -41,6 +41,6 @@ service cloud.firestore {
     return d.keys().hasOnly(['name','address','checkin','checkout','access','wifi','contact','ref','link','notes','updatedAt']);
   }
   function isFlights(d) {
-    return d.keys().hasOnly(['out','back','ref','airline','notes','updatedAt']);
+    return d.keys().hasOnly(['out','back','ref','ref2','airline','notes','updatedAt']);
   }
 }

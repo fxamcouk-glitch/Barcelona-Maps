@@ -1,7 +1,7 @@
 /* Lets the site open with no signal (e.g. at the gate) once it has been visited.
    The site's own files: network first, falling back to the saved copy.
    Libraries and fonts: saved copy first. Map tiles: saved as you browse, capped. */
-const SHELL = "bcn-shell-v10", LIBS = "bcn-libs-v2", TILES = "bcn-tiles-v2";
+const SHELL = "bcn-shell-v11", LIBS = "bcn-libs-v2", TILES = "bcn-tiles-v2";
 const FILES = ["./", "index.html", "styles.css", "app.js", "passes.js", "seed.js", "firebase-config.js", "manifest.webmanifest", "apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
