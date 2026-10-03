@@ -5,7 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Barcelona, 8–11 October</title>
 <meta name="description" content="Our shared map of places to see and eat in Barcelona.">
-<meta name="theme-color" content="#16202e">
+<meta name="theme-color" content="#f3f5f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1520" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Barcelona">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='13' r='9' fill='%231f4fd1'/%3E%3Cpath d='M16 30 9 18h14z' fill='%231f4fd1'/%3E%3Ccircle cx='16' cy='13' r='3.5' fill='white'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,6 +27,7 @@
     <div class="eyebrow">Thu 8 – Sun 11 October 2026 · 3 of us</div>
     <h1>Barcelona, 8–11 October</h1>
     <p class="sub">Everything we've been recommended, on one map. Tap a pin for details, or <a href="#add">add somewhere new</a>.</p>
+    <p class="sub tip" id="a2hs" hidden>Tip: in Safari, tap <strong>Share → Add to Home Screen</strong> to open this like an app.</p>
   </header>
 
   <div class="alert" role="note">
@@ -35,7 +44,7 @@
 
   <div class="map-card" id="map-card">
     <div class="pick-banner" id="pick-banner" hidden>Tap the map where the place is</div>
-    <div id="map" role="region" aria-label="Map of Barcelona with our places"></div>
+    <div class="map-box"><div id="map" role="region" aria-label="Map of Barcelona with our places"></div><div class="map-hint" id="map-hint" aria-hidden="true">Use two fingers to move the map</div></div>
     <div class="map-bar">
       <button type="button" class="btn-loc" id="loc-btn" aria-pressed="false">
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"/><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>

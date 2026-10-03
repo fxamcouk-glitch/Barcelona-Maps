@@ -32,7 +32,7 @@
 html, body { margin: 0; }
 body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; -webkit-text-size-adjust: 100%; }
 a { color: var(--see); }
-.wrap { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: calc(24px + env(safe-area-inset-top, 0px)) calc(48px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 24px; }
+.wrap { max-width: 760px; margin: 0 auto; padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); padding-block: calc(24px + env(safe-area-inset-top, 0px)) calc(48px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 24px; }
 header { display: grid; gap: 6px; }
 .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(30px, 7vw, 44px); line-height: 1.05; margin: 0; text-wrap: balance; }
@@ -49,7 +49,20 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 .map-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .map-card.picking { border-color: var(--see); box-shadow: 0 0 0 2px var(--see); }
-#map { height: min(62vh, 520px); min-height: 320px; width: 100%; background: var(--bg); }
+.map-box { position: relative; }
+#map { height: min(62vh, 520px); height: min(62svh, 520px); min-height: 320px; width: 100%; background: var(--bg); }
+.map-hint { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(15,21,32,.45); color: #fff; font: 600 15px var(--font-body); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 800; }
+.map-hint.show { opacity: 1; }
+.tip { font-size: 13.5px; }
+button, a.btn, .chip { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+@media (pointer: coarse) {
+  .chip, .btn, .btn-quiet, .btn-loc, .seg button, .btn-main { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .chip { padding-inline: 16px; font-size: 14px; }
+  .btn, .btn-quiet { padding-inline: 14px; font-size: 14px; }
+  .near-list li { padding-block: 12px; }
+  .near-list .meta a { padding-block: 4px; }
+  .leaflet-popup-content button { padding: 8px 0; }
+}
 .map-card.picking #map { cursor: crosshair; }
 .pick-banner { padding: 8px 14px; background: var(--see-soft); color: var(--see); font-size: 13.5px; font-weight: 600; }
 .map-bar { display: flex; flex-wrap: wrap; gap: 8px 14px; padding: 10px 12px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); align-items: center; }

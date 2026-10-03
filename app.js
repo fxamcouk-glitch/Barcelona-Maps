@@ -17,7 +17,23 @@ let PLACES = [], filter = "all", ME = null, store = null;
 
 /* ---------------- map ---------------- */
 const dark = matchMedia("(prefers-color-scheme: dark)");
-const map = L.map("map", { zoomControl: true, tap: true }).setView([41.388, 2.168], 13);
+/* On phones, one finger scrolls the page and two fingers move the map, so the map never traps scrolling. */
+const TOUCH = matchMedia("(pointer: coarse)").matches;
+const IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const map = L.map("map", { zoomControl: !TOUCH, dragging: !TOUCH, tap: false, touchZoom: true, bounceAtZoomLimits: false }).setView([41.388, 2.168], 13);
+if (TOUCH) {
+  const box = $("map"), hint = $("map-hint");
+  let hintTimer;
+  box.addEventListener("touchstart", e => {
+    if (e.touches.length >= 2) { map.dragging.enable(); hint.classList.remove("show"); }
+    else { map.dragging.disable(); }
+  }, { passive: true });
+  box.addEventListener("touchmove", e => {
+    if (e.touches.length === 1 && !picking) { hint.classList.add("show"); clearTimeout(hintTimer); hintTimer = setTimeout(() => hint.classList.remove("show"), 1200); }
+  }, { passive: true });
+  box.addEventListener("touchend", e => { if (e.touches.length === 0) map.dragging.disable(); }, { passive: true });
+}
+if (IOS && !navigator.standalone) { try { if (!localStorage.getItem("bcn-a2hs")) { $("a2hs").hidden = false; localStorage.setItem("bcn-a2hs", "1"); } } catch (_) {} }
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
   attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -94,7 +110,7 @@ function startLocation() {
     renderNear(); renderCards();
   }, err => {
     stopLocation();
-    showNear(err.code === 1 ? "Location is switched off for this site. Allow it in your browser's settings, then try again." : "Couldn't find your location just now. Try again in a moment.");
+    showNear(err.code === 1 ? (IOS ? "Location is off for this site. On iPhone: Settings → Privacy & Security → Location Services → Safari Websites → While Using the App. Then tap the button again." : "Location is switched off for this site. Allow it in your browser's settings, then try again.") : "Couldn't find your location just now. Try again in a moment.");
   }, { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 });
 }
 function stopLocation() {
@@ -121,6 +137,7 @@ function renderNear() {
     const k = document.createElement("span"); k.textContent = (p.type === "eat" ? "Eat & drink" : "See") + " · " + fmtDist(m);
     const a = document.createElement("a"); a.href = dirUrl(p, me, "walking"); a.target = "_blank"; a.rel = "noopener"; a.textContent = "Walk there";
     meta.append(k, a);
+    if (IOS) { const ap = document.createElement("a"); ap.href = appleUrl(p, me, "w"); ap.target = "_blank"; ap.rel = "noopener"; ap.textContent = "Apple Maps"; meta.appendChild(ap); }
     if (p.hours) { const h = document.createElement("span"); h.textContent = p.hours; meta.appendChild(h); }
     li.append(nm, d, meta); list.appendChild(li);
   });
@@ -133,6 +150,11 @@ function mapsUrl(p) {
   if (p.link && /^https:\/\//.test(p.link)) return p.link;
   if (p.address) return `https://www.google.com/maps/search/?api=1&query=${q(p)}`;
   return `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
+}
+/* Apple Maps directions: dirflg w = walking, r = public transport. */
+function appleUrl(p, from, flag) {
+  const dest = p.address ? encodeURIComponent(p.name + ", " + p.address) : p.lat + "," + p.lng;
+  return `https://maps.apple.com/?saddr=${from.lat},${from.lng}&daddr=${dest}&dirflg=${flag}`;
 }
 function dirUrl(p, from, mode) {
   const dest = p.pid ? q(p) + "&destination_place_id=" + p.pid : p.address ? q(p) : p.lat + "," + p.lng;
@@ -178,6 +200,7 @@ function card(p) {
   const a = (t, href, cls) => { const x = document.createElement("a"); x.className = "btn " + (cls || ""); x.href = href; x.target = "_blank"; x.rel = "noopener"; x.textContent = t; links.appendChild(x); };
   a("Open in Google Maps", mapsUrl(p), "primary");
   a("Directions from base", dirUrl(p, BASE, "transit"));
+  if (IOS) a("Apple Maps", appleUrl(p, BASE, "r"));
   if (p.bookUrl) a("Book", p.bookUrl, "bookbtn");
   const show = document.createElement("button"); show.type = "button"; show.className = "btn-quiet"; show.textContent = "Show on map";
   show.addEventListener("click", () => focusPlace(p.id, true)); links.appendChild(show);
