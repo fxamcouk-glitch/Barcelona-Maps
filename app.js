@@ -2,12 +2,13 @@ import { firebaseConfig } from "./firebase-config.js";
 import { SEED } from "./seed.js";
 
 const FB = "https://www.gstatic.com/firebasejs/10.12.2/";
-const BASE = { lat: 41.3895, lng: 2.1670 };
+/* Our stay, from the booking map: Dreta de l'Eixample, just north of Diagonal. Nearest metro: Diagonal (L3, L5). */
+const BASE = { lat: 41.3978, lng: 2.1643 };
 const AREAS = [
-  { id: "born", name: "El Born & Sant Pere", blurb: "10–15 minutes' walk east. Market snacks, Picasso, then dinner, all within a few minutes of each other. Best on Thursday or Friday, when the market is open late." },
-  { id: "uptown", name: "Gaudí & uptown", blurb: "North of us, up the hill. Sagrada Família and Park Güell need timed tickets; Bar Mut is straight up the road on the way back." },
-  { id: "old", name: "La Rambla & Old Town", blurb: "Five to ten minutes down La Rambla. Go to the market in the morning." },
-  { id: "montjuic", name: "Montjuïc", blurb: "A half-day on the hill to the south-west. The Olympic Stadium is a quick look; Miró and MNAC are next to it. Avoid Sunday afternoon (MNAC shuts at 3pm)." },
+  { id: "born", name: "El Born & Sant Pere", blurb: "About 25 minutes' walk south-east, or L4 from Verdaguer to Jaume I. Market snacks, Picasso, then dinner, all within a few minutes of each other. Best on Thursday or Friday, when the market is open late." },
+  { id: "uptown", name: "Gaudí & uptown", blurb: "Right on our doorstep. Bar Mut is a few minutes' walk, Sagrada Família about 15 minutes east, and Park Güell is two stops up the L3 from Diagonal to Lesseps. Sagrada Família and Park Güell need timed tickets." },
+  { id: "old", name: "La Rambla & Old Town", blurb: "About 30 minutes' walk down Passeig de Gràcia, or three stops on the L3 from Diagonal to Liceu. Go to the market in the morning." },
+  { id: "montjuic", name: "Montjuïc", blurb: "A half-day on the hill to the south-west: L3 from Diagonal to Paral·lel, then the funicular up. The Olympic Stadium is a quick look; Miró and MNAC are next to it. Avoid Sunday afternoon (MNAC shuts at 3pm)." },
   { id: "added", name: "Added by the group", blurb: "New suggestions from any of us. Newest first." }
 ];
 const FIELDS = ["name","type","area","order","note","from","hours","walk","lat","lng","pid","address","link","bookUrl","book","addedBy","createdAt","editedAt","editedBy"];
@@ -34,13 +35,29 @@ if (TOUCH) {
   box.addEventListener("touchend", e => { if (e.touches.length === 0) map.dragging.disable(); }, { passive: true });
 }
 if (IOS && !navigator.standalone) { try { if (!localStorage.getItem("bcn-a2hs")) { $("a2hs").hidden = false; localStorage.setItem("bcn-a2hs", "1"); } } catch (_) {} }
-L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 19,
-  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+/* A soft, Google-style street map from OpenFreeMap (free, no key). Falls back to the
+   standard OpenStreetMap tiles if the phone can't draw vector maps. */
+const OSM_ATTR = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+let base;
+try {
+  const gl = (() => { try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); } catch (_) { return false; } })();
+  if (!L.maplibreGL || !window.maplibregl || !gl) throw new Error("no vector maps");
+  base = L.maplibreGL({ style: "https://tiles.openfreemap.org/styles/liberty", attribution: '<a href="https://openfreemap.org">OpenFreeMap</a> ' + OSM_ATTR });
+} catch (e) {
+  base = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: OSM_ATTR + " contributors" });
+}
+base.addTo(map);
 
-const icon = (cls, label) => L.divIcon({ className: "", iconSize: [0, 0], html: `<div class="pin ${cls}"><div class="d"></div>${label ? `<div class="t">${esc(label)}</div>` : ""}</div>` });
-L.marker([BASE.lat, BASE.lng], { icon: icon("base", "Base"), keyboard: false, zIndexOffset: 500 }).addTo(map).bindPopup("<b>Base</b>Gran Via, near Passeig de Gràcia");
+/* Pins in the style of Google / Airbnb maps: a coloured teardrop with an icon, label beside it. */
+const GLYPH = {
+  eat: '<svg viewBox="0 0 24 24"><path d="M7 2v8a2 2 0 0 0 2 2v10h2V12a2 2 0 0 0 2-2V2h-1.5v6H11V2H9.5v6H9V2zm9.5 0C15 2 14 4 14 7v6h2.5v9H18.5V2z" fill="currentColor"/></svg>',
+  see: '<svg viewBox="0 0 24 24"><path d="M12 2 2 7v2h20V7zM4 11v7h3v-7zm6.5 0v7h3v-7zM17 11v7h3v-7zM2 20v2h20v-2z" fill="currentColor"/></svg>',
+  air: '<svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" fill="currentColor"/></svg>',
+  home: '<svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3z" fill="currentColor"/></svg>'
+};
+const icon = (cls, label, sub) => L.divIcon({ className: "", iconSize: [0, 0], html:
+  `<div class="pin ${cls}"><div class="d">${GLYPH[cls] || ""}</div>${label ? `<div class="t">${esc(label)}${sub ? `<small>${esc(sub)}</small>` : ""}</div>` : ""}</div>` });
+L.marker([BASE.lat, BASE.lng], { icon: icon("home", "Your stay", "8 – 11 Oct"), keyboard: false, zIndexOffset: 1500 }).addTo(map).bindPopup("<b>Your stay</b>Just north of Diagonal. Nearest metro: Diagonal (L3, L5).");
 
 /* The page's fonts and layout can settle after the map is created, so re-measure
    whenever the map's box changes size; otherwise only a sliver of streets is drawn. */
@@ -57,7 +74,7 @@ const AIRPORT = [
   { name: "Airport T1", lat: 41.2887, lng: 2.0726 },
   { name: "Airport T2", lat: 41.3036, lng: 2.0790 }
 ];
-AIRPORT.forEach(a => L.marker([a.lat, a.lng], { icon: icon("air", "✈︎ " + a.name), keyboard: false, zIndexOffset: 400 }).addTo(map).bindPopup("<b>Barcelona " + a.name.replace("Airport ", "Airport, ") + "</b>Aerobús to Plaça Catalunya"));
+AIRPORT.forEach(a => L.marker([a.lat, a.lng], { icon: icon("air", "✈︎ " + a.name), keyboard: false, zIndexOffset: 400 }).addTo(map).bindPopup("<b>Barcelona " + a.name.replace("Airport ", "Airport, ") + "</b>Aerobús to Plaça Catalunya, then L3 to Diagonal"));
 $("air-show").addEventListener("click", () => { $("map-card").scrollIntoView({ behavior: "smooth", block: "start" }); map.fitBounds([[41.2887, 2.0726], [41.3036, 2.0790], [BASE.lat, BASE.lng]], { padding: [40, 40] }); });
 
 const markerLayer = L.layerGroup().addTo(map);
@@ -201,12 +218,12 @@ function card(p) {
   if (p.note) { const n = document.createElement("p"); n.className = "note"; n.textContent = p.note; c.appendChild(n); }
   const dl = document.createElement("dl"); dl.className = "facts";
   const fact = (k, v) => { if (!v) return; const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = v; dl.append(dt, dd); };
-  fact("Address", p.address); fact("Open", p.hours); fact("From base", p.walk); fact("Tip from", p.from); fact("Added by", p.addedBy);
+  fact("Address", p.address); fact("Open", p.hours); fact("From our stay", walkLabel(distM(BASE, p))); fact("Tip from", p.from); fact("Added by", p.addedBy);
   if (dl.children.length) c.appendChild(dl);
   const links = document.createElement("div"); links.className = "links";
   const a = (t, href, cls) => { const x = document.createElement("a"); x.className = "btn " + (cls || ""); x.href = href; x.target = "_blank"; x.rel = "noopener"; x.textContent = t; links.appendChild(x); };
   a("Open in Google Maps", mapsUrl(p), "primary");
-  a("Directions from base", dirUrl(p, BASE, "transit"));
+  a("Directions from our stay", dirUrl(p, BASE, "transit"));
   if (IOS) a("Apple Maps", appleUrl(p, BASE, "r"));
   if (p.bookUrl) a("Book", p.bookUrl, "bookbtn");
   const show = document.createElement("button"); show.type = "button"; show.className = "btn-quiet"; show.textContent = "Show on map";

@@ -19,6 +19,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -51,9 +52,9 @@
         <span id="loc-label">Show where I am</span>
       </button>
       <button type="button" class="btn" id="fit-btn">Show all places</button>
-      <span class="legend"><span class="dot" style="background:var(--base)"></span>Base</span>
-      <span class="legend"><span class="dot" style="background:var(--see)"></span>See</span>
-      <span class="legend"><span class="dot" style="background:var(--eat)"></span>Eat &amp; drink</span>
+      <span class="legend"><span class="dot" style="background:#16202e"></span>Your stay</span>
+      <span class="legend"><span class="dot" style="background:#e07a9a"></span>See</span>
+      <span class="legend"><span class="dot" style="background:#e3a320"></span>Eat &amp; drink</span>
     </div>
   </div>
 
@@ -67,13 +68,13 @@
     <div class="place-top"><h2 id="air-h">✈︎ Barcelona Airport (BCN)</h2><span class="tag travel">Getting there</span></div>
     <p class="note">El Prat has two terminals, about 4 km apart, with a free shuttle bus between them. Check your boarding pass for T1 or T2.</p>
     <dl class="facts">
-      <dt>Easiest</dt><dd><strong>Aerobús</strong> from either terminal to Plaça Catalunya, a 5-minute walk from our base. Runs every few minutes, about 35 minutes. Buy tickets on board by card or online.</dd>
-      <dt>Cheaper</dt><dd>Train R2 Nord from T2 to Passeig de Gràcia, about 25 minutes. From T1, take the shuttle to T2 first.</dd>
+      <dt>Easiest</dt><dd><strong>Aerobús</strong> from either terminal to Plaça Catalunya (about 35 minutes, every few minutes; pay on board by card or online). Then two stops on the L3 to Diagonal, or a 20-minute walk up Passeig de Gràcia.</dd>
+      <dt>Cheaper</dt><dd>Train R2 Nord from T2 to Passeig de Gràcia, about 25 minutes, then one stop on the L3 or L5 to Diagonal. From T1, take the shuttle to T2 first.</dd>
       <dt>Taxi</dt><dd>About 25–30 minutes from the rank outside arrivals.</dd>
     </dl>
     <div class="links">
-      <a class="btn primary" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=Barcelona+Airport+Terminal+1&destination=41.3895,2.1670&travelmode=transit">Airport to base</a>
-      <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=41.3895,2.1670&destination=Barcelona+Airport+Terminal+1&travelmode=transit">Base to airport</a>
+      <a class="btn primary" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=Barcelona+Airport+Terminal+1&destination=41.3978,2.1643&travelmode=transit">Airport to our stay</a>
+      <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=41.3978,2.1643&destination=Barcelona+Airport+Terminal+1&travelmode=transit">Our stay to airport</a>
       <a class="btn" target="_blank" rel="noopener" href="https://www.aerobusbcn.com/en">Aerobús times &amp; tickets</a>
       <button type="button" class="btn-quiet" id="air-show">Show on map</button>
     </div>
@@ -94,7 +95,7 @@
       <div class="place-top"><h3>Where we're staying</h3><button type="button" class="btn-quiet" id="stay-edit">Edit</button></div>
       <div id="stay-view"></div>
       <form id="stay-form" hidden novalidate>
-        <div class="field"><label for="st-name">Name</label><input id="st-name" maxlength="300" placeholder="e.g. Apartment on Gran Via"></div>
+        <div class="field"><label for="st-name">Name</label><input id="st-name" maxlength="300" placeholder="e.g. Apartment near Diagonal"></div>
         <div class="field"><label for="st-address">Address</label><input id="st-address" maxlength="300" placeholder="Street, number, floor and door"></div>
         <div class="two">
           <div class="field"><label for="st-checkin">Check-in</label><input id="st-checkin" maxlength="300" placeholder="e.g. Thu 8 Oct from 15:00"></div>
@@ -178,6 +179,8 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@maplibre/maplibre-gl-leaflet@0.1.4/leaflet-maplibre-gl.js"></script>
 <script type="module" src="app.js"></script>
 <script type="module" src="passes.js"></script>
 </body>
