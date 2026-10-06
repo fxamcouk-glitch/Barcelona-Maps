@@ -1,6 +1,6 @@
 import { firebaseConfig } from "./firebase-config.js";
 import { SEED } from "./seed.js";
-import { GUIDE_PLACES, GUIDE_STARS } from "./guides.js?v=22";
+import { GUIDE_PLACES, GUIDE_STARS } from "./guides.js?v=23";
 
 const FB = "https://www.gstatic.com/firebasejs/10.12.2/";
 /* Our stay: Carrer del Rosselló, just below Diagonal. Nearest metro: Diagonal (L3, L5). */

@@ -363,7 +363,7 @@ async function init() {
   $("bp-unlock").addEventListener("submit", async e => {
     e.preventDefault();
     const code = $("bp-code").value;
-    if (code.trim().length < 6) { say("Use a passcode of at least 6 characters, and share it with the others privately.", true); return; }
+    if (code.trim().length < 5) { say("Use a passcode of at least 5 characters, and share it with the others privately.", true); return; }
     try { localStorage.setItem("bcn-pass-code", code); } catch (_) {}
     say("Opening…");
     try { await openShared(code); say(""); } catch (err) { say("Couldn't connect to the shared passes.", true); }
