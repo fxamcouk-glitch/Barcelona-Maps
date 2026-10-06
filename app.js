@@ -1,10 +1,10 @@
 import { firebaseConfig } from "./firebase-config.js";
 import { SEED } from "./seed.js";
-import { GUIDE_PLACES, GUIDE_STARS } from "./guides.js?v=19";
+import { GUIDE_PLACES, GUIDE_STARS } from "./guides.js?v=20";
 
 const FB = "https://www.gstatic.com/firebasejs/10.12.2/";
-/* Our stay, from the booking map: Dreta de l'Eixample, just north of Diagonal. Nearest metro: Diagonal (L3, L5). */
-const BASE = { lat: 41.3978, lng: 2.1643 };
+/* Our stay: Carrer del Rosselló, just below Diagonal. Nearest metro: Diagonal (L3, L5). */
+const BASE = { lat: 41.3986, lng: 2.1646 };
 const AREAS = [
   { id: "born", name: "El Born & Sant Pere", blurb: "About 25 minutes' walk south-east, or L4 from Verdaguer to Jaume I. Market snacks, Picasso, then dinner, all within a few minutes of each other. Best on Thursday or Friday, when the market is open late." },
   { id: "uptown", name: "Gaudí & uptown", blurb: "Right on our doorstep. Bar Mut is a few minutes' walk, Sagrada Família about 15 minutes east, and Park Güell is two stops up the L3 from Diagonal to Lesseps. Sagrada Família and Park Güell need timed tickets." },
@@ -89,7 +89,7 @@ const GLYPH = {
 };
 const icon = (cls, label, sub) => L.divIcon({ className: "", iconSize: [0, 0], html:
   `<div class="pin ${cls}"><div class="d">${GLYPH[cls.split(" ")[0]] || ""}</div>${label ? `<div class="t">${esc(label)}${sub ? `<small>${esc(sub)}</small>` : ""}</div>` : ""}</div>` });
-L.marker([BASE.lat, BASE.lng], { icon: icon("home", "Your stay", "8 – 11 Oct"), keyboard: false, zIndexOffset: 1500 }).addTo(map).bindPopup("<b>Your stay</b>Just north of Diagonal. Nearest metro: Diagonal (L3, L5).");
+L.marker([BASE.lat, BASE.lng], { icon: icon("home", "Your stay", "8 – 11 Oct"), keyboard: false, zIndexOffset: 1500 }).addTo(map).bindPopup("<b>Your stay</b>Carrer del Rosselló, just below Diagonal. Nearest metro: Diagonal (L3, L5).");
 
 /* The page's fonts and layout can settle after the map is created, so re-measure
    whenever the map's box changes size; otherwise only a sliver of streets is drawn. */
