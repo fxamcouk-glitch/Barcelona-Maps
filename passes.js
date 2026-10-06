@@ -73,7 +73,15 @@ async function openShared(code) {
     shared.list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     render();
   }, err => { console.error(err); say("Couldn't open the shared passes. Check the passcode and your signal.", true); });
-  shared.unsubStay = fs.onSnapshot(stayRef, d => { shared.stay = d.exists() ? d.data() : null; renderStay(); }, err => console.error(err));
+  shared.unsubStay = fs.onSnapshot(stayRef, d => { shared.stay = d.exists() ? d.data() : null; renderStay(); }, err => {
+    console.error(err); renderLock();
+    const v = $("stay-view"); v.replaceChildren();
+    const e = document.createElement("p"); e.className = "bp-empty";
+    e.textContent = err && err.code === "permission-denied"
+      ? "Can't open the private details yet: the database rules need publishing in Firebase (Firestore → Rules → Publish)."
+      : "Couldn't load the stay details. Check your signal and reopen the site.";
+    v.appendChild(e);
+  });
   shared.flRef = fs.doc(db, "trip_" + name.slice(7), "flights");
   shared.unsubFl = fs.onSnapshot(shared.flRef, d => { shared.flights = d.exists() ? d.data() : null; renderFlights(); }, err => console.error(err));
   renderLock();
