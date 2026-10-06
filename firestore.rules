@@ -38,7 +38,8 @@ service cloud.firestore {
       && d.img is string && d.img.size() < 1000000;
   }
   function isStay(d) {
-    return d.keys().hasOnly(['name','address','checkin','checkout','access','wifi','contact','ref','link','notes','updatedAt']);
+    return d.keys().hasOnly(['name','address','checkin','checkout','access','wifi','contact','ref','link','notes','photo','updatedAt'])
+      && (!('photo' in d) || (d.photo is string && d.photo.size() < 900000));
   }
   function isFlights(d) {
     return d.keys().hasOnly(['out','back','ref','ref2','airline','notes','updatedAt']);

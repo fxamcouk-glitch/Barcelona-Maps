@@ -98,9 +98,15 @@ function renderStay() {
   renderLock();
   const v = $("stay-view"); v.replaceChildren();
   const st = shared && shared.stay;
-  if (!st || !STAY_FIELDS.some(([k]) => st[k])) {
+  if (!st || !(st.photo || STAY_FIELDS.some(([k]) => st[k]))) {
     const e = document.createElement("p"); e.className = "bp-empty"; e.textContent = "No accommodation details yet. Tap Edit to add the address, check-in times and how to get in.";
     v.appendChild(e); return;
+  }
+  if (st.photo) {
+    const ph = document.createElement("button"); ph.type = "button"; ph.className = "stay-photo"; ph.setAttribute("aria-label", "Open photo of the front door");
+    const im = document.createElement("img"); im.src = st.photo; im.alt = "Front door of our building"; ph.appendChild(im);
+    ph.addEventListener("click", () => openPass({ kind: "img", img: st.photo, who: "Front door", alt: "Front door of our building" }));
+    v.appendChild(ph);
   }
   const dl = document.createElement("dl"); dl.className = "facts";
   STAY_FIELDS.forEach(([k, label]) => {
@@ -123,8 +129,14 @@ function renderStay() {
 }
 function editStay(on) {
   $("stay-form").hidden = !on; $("stay-view").hidden = on; $("stay-edit").hidden = on;
-  if (on) { const st = (shared && shared.stay) || {}; STAY_FIELDS.forEach(([k]) => { $("st-" + k).value = st[k] || ""; }); $("st-name").focus(); }
+  if (on) {
+    const st = (shared && shared.stay) || {}; STAY_FIELDS.forEach(([k]) => { $("st-" + k).value = st[k] || ""; });
+    removePhoto = false; $("st-photo").value = "";
+    $("st-photo-cur").hidden = !st.photo; if (st.photo) $("st-photo-prev").src = st.photo;
+    $("st-name").focus();
+  }
 }
+let removePhoto = false;
 async function saveStay(e) {
   e.preventDefault();
   if (!shared) return;
@@ -132,8 +144,12 @@ async function saveStay(e) {
   STAY_FIELDS.forEach(([k]) => { const v = $("st-" + k).value.trim(); if (v) body[k] = v.slice(0, k === "notes" || k === "access" ? 1000 : 300); });
   body.updatedAt = new Date().toISOString();
   $("st-save").disabled = true; $("st-msg").textContent = "Saving…";
-  try { await shared.fs.setDoc(shared.stayRef, body); editStay(false); $("st-msg").textContent = ""; }
-  catch (err) { console.error(err); $("st-msg").textContent = "Couldn't save. Check your signal and try again."; }
+  try {
+    const file = $("st-photo").files[0], old = shared.stay && shared.stay.photo;
+    if (file) body.photo = await toJpegDataUrl(file, 700000);
+    else if (old && !removePhoto) body.photo = old;
+    await shared.fs.setDoc(shared.stayRef, body); editStay(false); $("st-msg").textContent = ""; }
+  catch (err) { console.error(err); $("st-msg").textContent = err && err.message === "too big" ? "That photo is too large. Try a smaller one." : "Couldn't save. Check your signal and try again."; }
   finally { $("st-save").disabled = false; }
 }
 
@@ -293,7 +309,7 @@ function openPass(p) {
   if (p.kind === "pdf") {
     const blob = p.blob instanceof Blob ? p.blob : null;
     if (blob) { const u = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = u; a.target = "_blank"; a.rel = "noopener"; a.className = "btn-main"; a.textContent = "Open the PDF"; a.dataset.i = "pdf"; body.appendChild(a); }
-  } else { const im = document.createElement("img"); im.src = p.img; im.alt = "Boarding pass"; body.appendChild(im); }
+  } else { const im = document.createElement("img"); im.src = p.img; im.alt = p.alt || "Boarding pass"; body.appendChild(im); }
   $("bp-view-title").textContent = [p.who, p.flight].filter(Boolean).join(" · ") || "Boarding pass";
   v.hidden = false; document.body.classList.add("noscroll");
   $("bp-close").focus();
@@ -360,6 +376,12 @@ async function init() {
   $("fl-unlock-link").addEventListener("click", () => setTimeout(() => $("bp-code").focus({ preventScroll: true }), 500));
   $("st-cancel").addEventListener("click", () => editStay(false));
   $("stay-form").addEventListener("submit", saveStay);
+  $("st-photo").addEventListener("change", () => {
+    const f = $("st-photo").files[0]; if (!f) return;
+    const prev = $("st-photo-prev"); if (prev.src.startsWith("blob:")) URL.revokeObjectURL(prev.src);
+    prev.src = URL.createObjectURL(f); $("st-photo-cur").hidden = false; removePhoto = false;
+  });
+  $("st-photo-del").addEventListener("click", () => { removePhoto = true; $("st-photo-cur").hidden = true; $("st-photo").value = ""; });
   renderLock();
   if (!IOS) $("bp-wallet").hidden = true;
   try { LOCAL = await localAll(); } catch (e) { LOCAL = []; }
